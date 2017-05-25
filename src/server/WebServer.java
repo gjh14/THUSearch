@@ -41,6 +41,7 @@ public class WebServer extends HttpServlet {
 		else{
 			System.out.println(queryString);
 			TopDocs results = search.searchQuery(queryString);
+			String[] urls = null;
 			String[] tags = null;
 			String[] abss = null;
 			String[] paths = null;
@@ -48,6 +49,7 @@ public class WebServer extends HttpServlet {
 				ScoreDoc[] hits = results.scoreDocs;
 				maxpage = (hits.length - 1) / 10 + 1;
 				int len = Math.min(10, hits.length - (page - 1)* 10);
+				urls = new String[len];
 				tags = new String[len];
 				abss = new String[len];
 				paths = new String[len];
@@ -57,7 +59,8 @@ public class WebServer extends HttpServlet {
 					Lighter lighter = new Lighter(queryString, doc);
 					tags[i] = lighter.getTag();
 					abss[i] = lighter.getAbs();
-					paths[i] = doc.get("file");
+					urls[i] = doc.get("url");
+					paths[i] = doc.get("path");
 					System.out.println("doc=" + hit.doc + " score="
 							+ hit.score + " tag=" + tags[i]);
 				}
@@ -68,6 +71,7 @@ public class WebServer extends HttpServlet {
 			request.setAttribute("currentQuery",queryString);
 			request.setAttribute("currentPage", page);
 			request.setAttribute("maxPage", maxpage);
+			request.setAttribute("webUrls", urls);
 			request.setAttribute("webTags", tags);
 			request.setAttribute("webAbss", abss); 
 			request.setAttribute("webPaths", paths);

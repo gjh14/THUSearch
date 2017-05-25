@@ -1,6 +1,8 @@
 package index;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -29,20 +31,40 @@ public class WebIndex {
     		e.printStackTrace();
     	}
     }
+	public Document fileDocument(File file){
+		String name = file.getName();
+		String[] token = name.split("\\.");
+		switch(token[token.length - 1]){
+		case "html":
+			return HtmlIndex.getDocument(file);
+		case "doc":
+			return DocIndex.getDocument(file);
+		case "docx":
+			return DocxIndex.getDocument(file);
+		case "pdf":
+			return PDFIndex.getDocument(file);
+		default:
+		}
+		return null;
+	}
 	
 	public void buildIndex(String path){
 		try{
 			IndexWriter indexWriter = new IndexWriter(dir,iwc);
 			indexWriter.deleteAll();
-			
-			File input = new File(path);
-			for(File file : input.listFiles()){
-				Document document = new Document();
-				document.add(new StringField("file", file.getName(), Field.Store.YES));
-				document.add(new FloatDocValuesField("pagerank", 1));
-				System.out.println("file=" + file.getName());
+			BufferedReader reader = new BufferedReader(new FileReader("data.txt"));
+			for(String line; (line = reader.readLine()) != null;){
+				String[] parts = line.split("\t");
+				System.out.println(parts[0] + " " + parts[1] + " " + parts[2]);
+				File file = new File(parts[1]);
+				Document document = fileDocument(file);
+				document.add(new StringField("url", parts[0], Field.Store.YES));
+				document.add(new StringField("name", file.getName(), Field.Store.YES));
+				document.add(new StringField("path", file.getPath(), Field.Store.YES));
+				document.add(new FloatDocValuesField("pagerank", Float.parseFloat(parts[2])));
 				indexWriter.addDocument(document);
 			}
+			reader.close();
 			indexWriter.close();
 		}catch(IOException e){
 			e.printStackTrace();

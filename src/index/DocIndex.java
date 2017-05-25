@@ -31,7 +31,7 @@ public class DocIndex {
 	}
 	
 	public static void main(String[] args){
-		File file = new File("input/doc/4-hitch.doc");
+		File file = new File("mirror/doc/4-hitch.doc");
 		getDocument(file);
 	}
 }

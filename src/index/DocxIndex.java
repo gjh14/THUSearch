@@ -33,7 +33,7 @@ public class DocxIndex {
 	}
 	
 	public static void main(String[] args){
-		File file = new File("input/OOP.docx");
+		File file = new File("mirror/docx/58eb20bc821f3.docx");
 		getDocument(file);
 	}
 }

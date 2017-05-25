@@ -38,7 +38,7 @@ public class Lighter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		String name = doc.get("file");
+		String name = doc.get("name");
 		String[] token = name.split("\\.");
 		if(token[token.length - 1].equals("html")){
 			tag = doc.get("title");
