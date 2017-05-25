@@ -1,0 +1,84 @@
+package search;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queries.CustomScoreQuery;
+import org.apache.lucene.queries.function.FunctionQuery;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.similarities.BM25Similarity;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.wltea.analyzer.lucene.IKAnalyzer;
+
+public class WebSearch {
+	private IndexReader reader;
+	private IndexSearcher searcher;
+	private Analyzer analyzer;
+	private Map<String, Float> boosts;
+	private static String[] field = new String[]{"title", "body"};
+
+	public WebSearch(String indexDir){		
+		analyzer = new IKAnalyzer();
+		boosts = new HashMap<String, Float>();
+		boosts.put("title", 2.0f);
+		boosts.put("body", 1.0f);
+		try{
+			Directory dir = FSDirectory.open(new File(indexDir).toPath());
+			reader = DirectoryReader.open(dir);
+			searcher = new IndexSearcher(reader);
+			searcher.setSimilarity(new BM25Similarity());
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public TopDocs searchQuery(String queryString){
+		System.out.println("query=" + queryString);
+		MultiFieldQueryParser parser = new MultiFieldQueryParser(field, analyzer, boosts);
+		try {
+			Query normalQuery = parser.parse(queryString);
+			FunctionQuery rankQuery = new FunctionQuery(new PageRankValueScore());
+			CustomScoreQuery query = new CustomScoreQuery(normalQuery, rankQuery);  
+			return searcher.search(query, 5);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public Document getDoc(int doc) {
+		try {
+			return searcher.doc(doc);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	public static void main(String[] args){ 
+		WebSearch search = new WebSearch("index");
+		TopDocs results = search.searchQuery("Çå»ª");
+		ScoreDoc[] hits = results.scoreDocs;
+		for (ScoreDoc web : hits) {
+			Document doc = search.getDoc(web.doc);
+			System.out.println("doc=" + web.doc + " score="
+					+ web.score + " title=" + doc.get("title"));
+		}
+	}
+}
