@@ -32,13 +32,14 @@ public class WebSearch {
 	private IndexSearcher searcher;
 	private Analyzer analyzer;
 	private Map<String, Float> boosts;
-	private static String[] field = new String[]{"title", "body"};
+	private static String[] field = new String[]{"title", "body", "text"};
 
 	public WebSearch(String indexDir){		
 		analyzer = new IKAnalyzer();
 		boosts = new HashMap<String, Float>();
 		boosts.put("title", 2.0f);
 		boosts.put("body", 1.0f);
+		boosts.put("text", 1.0f);
 		try{
 			Directory dir = FSDirectory.open(new File(indexDir).toPath());
 			reader = DirectoryReader.open(dir);
