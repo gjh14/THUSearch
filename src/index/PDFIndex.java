@@ -31,7 +31,7 @@ public class PDFIndex{
 	}
 	
 	public static void main(String[] args){
-		File file = new File("mirror/pdf/doc_2015.pdf");
+		File file = new File("mirror/pdf/hoti2012_parasplit.pdf");
 		Document doc = getDocument(file);
 		System.out.println(doc.get("text"));
 	}
