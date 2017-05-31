@@ -38,7 +38,7 @@ public class Detector {
 		try{
 			InputStream in = new ByteArrayInputStream(text.getBytes());
 			Charset charset = detector.detectCodepage(in, text.getBytes().length);
-			return charset.name();
+			return charset.name() != null ? charset.name() : "gbk";
 		}catch(Exception e){
 			e.printStackTrace();
 		}

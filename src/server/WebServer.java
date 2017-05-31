@@ -1,6 +1,5 @@
 package server;
 
-
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -16,7 +15,7 @@ import search.WebSearch;
 
 public class WebServer extends HttpServlet {
 	private WebSearch search;
-	
+
 	public WebServer() {
 		super();
 		search = new WebSearch("index");
@@ -33,12 +32,12 @@ public class WebServer extends HttpServlet {
 		request.setCharacterEncoding("utf-8");
 		String queryString = request.getParameter("query");
 		String pageString = request.getParameter("page");
-		
-		int	page = pageString != null ? Integer.parseInt(pageString) : 1;
+
+		int page = pageString != null ? Integer.parseInt(pageString) : 1;
 		int maxpage = 0;
-		if(queryString == null)
+		if (queryString == null)
 			System.out.println("null query");
-		else{
+		else {
 			System.out.println(queryString);
 			TopDocs results = search.searchQuery(queryString);
 			String[] urls = null;
@@ -48,12 +47,12 @@ public class WebServer extends HttpServlet {
 			if (results != null && results.scoreDocs.length > 0) {
 				ScoreDoc[] hits = results.scoreDocs;
 				maxpage = (hits.length - 1) / 10 + 1;
-				int len = Math.min(10, hits.length - (page - 1)* 10);
+				int len = Math.min(10, hits.length - (page - 1) * 10);
 				urls = new String[len];
 				tags = new String[len];
 				abss = new String[len];
 				paths = new String[len];
-				for(int i = 0; i < len; ++i){
+				for (int i = 0; i < len; ++i) {
 					ScoreDoc hit = hits[10 * (page - 1) + i];
 					Document doc = search.getDoc(hit.doc);
 					Lighter lighter = new Lighter(queryString, doc);
@@ -61,25 +60,23 @@ public class WebServer extends HttpServlet {
 					abss[i] = lighter.getAbs();
 					urls[i] = doc.get("url");
 					paths[i] = doc.get("path");
-					System.out.println("doc=" + hit.doc + " score="
-							+ hit.score + " tag=" + tags[i]);
+					System.out.println("doc=" + hit.doc + " score=" + hit.score + " tag=" + tags[i]);
 				}
-			}else{
+			} else {
 				System.out.println("result null");
 			}
-			
-			request.setAttribute("currentQuery",queryString);
+
+			request.setAttribute("currentQuery", queryString);
 			request.setAttribute("currentPage", page);
 			request.setAttribute("maxPage", maxpage);
 			request.setAttribute("webUrls", urls);
 			request.setAttribute("webTags", tags);
-			request.setAttribute("webAbss", abss); 
+			request.setAttribute("webAbss", abss);
 			request.setAttribute("webPaths", paths);
-			request.getRequestDispatcher("/webshow.jsp").forward(request,
-					response);
+			request.getRequestDispatcher("/webshow.jsp").forward(request, response);
 		}
 	}
-	
+
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		this.doGet(request, response);

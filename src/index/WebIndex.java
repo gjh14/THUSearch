@@ -9,9 +9,11 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FloatDocValuesField;
+import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.queries.function.docvalues.LongDocValues;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -31,37 +33,29 @@ public class WebIndex {
     		e.printStackTrace();
     	}
     }
-	public Document fileDocument(File file){
-		String name = file.getName();
-		String[] token = name.split("\\.");
-		switch(token[token.length - 1]){
-		case "html":
-			return HtmlIndex.getDocument(file);
-		case "doc":
-			return DocIndex.getDocument(file);
-		case "docx":
-			return DocxIndex.getDocument(file);
-		case "pdf":
-			return PDFIndex.getDocument(file);
-		default:
-		}
-		return null;
-	}
-	
+
 	public void buildIndex(String path){
+		int cnt = 0;
 		try{
 			IndexWriter indexWriter = new IndexWriter(dir,iwc);
-			indexWriter.deleteAll();
-			BufferedReader reader = new BufferedReader(new FileReader("data.txt"));
+			BufferedReader reader = new BufferedReader(new FileReader(new File(path + "data.txt")));
 			for(String line; (line = reader.readLine()) != null;){
+				if(cnt++ < indexWriter.maxDoc())
+					continue;
+				if(cnt % 1000 == 0)
+					System.out.println("Count " + cnt);
 				String[] parts = line.split("\t");
-				System.out.println(parts[0] + " " + parts[1] + " " + parts[2]);
-				File file = new File(parts[1]);
-				Document document = fileDocument(file);
+				File file = new File(path + parts[1]);
+				Document document = FileIndex.getDocument(file);
+				if(document == null){
+					System.err.println(cnt + " " + parts[0] + " " + parts[1] + " " + parts[2]);
+					continue;
+				}
 				document.add(new StringField("url", parts[0], Field.Store.YES));
 				document.add(new StringField("name", file.getName(), Field.Store.YES));
-				document.add(new StringField("path", file.getPath(), Field.Store.YES));
+				document.add(new StringField("path", file.getAbsolutePath(), Field.Store.YES));
 				document.add(new FloatDocValuesField("pagerank", Float.parseFloat(parts[2])));
+				document.add(new NumericDocValuesField("click", 0));
 				indexWriter.addDocument(document);
 			}
 			reader.close();
@@ -73,6 +67,6 @@ public class WebIndex {
 	
 	public static void main(String[] args){
 		WebIndex index = new WebIndex("index");
-		index.buildIndex("input");
+		index.buildIndex("D:/workspace/mirror__3/");
 	}
 }

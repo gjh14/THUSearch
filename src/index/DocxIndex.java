@@ -2,8 +2,6 @@ package index;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
@@ -21,12 +19,11 @@ public class DocxIndex {
 			String text = extractor.getText();
 			if(text != null){
 				String trans = new String(text.getBytes(), Detector.textCode(text)).replaceAll("\\?", "");
-				System.out.println(trans);
-				document.add(new TextField("text", trans, Field.Store.YES));
+				document.add(new TextField("text", trans, Field.Store.NO));
 			}
 			extractor.close();
 			return document;
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -34,6 +31,7 @@ public class DocxIndex {
 	
 	public static void main(String[] args){
 		File file = new File("mirror/docx/58eb20bc821f3.docx");
-		getDocument(file);
+		Document doc = getDocument(file);
+		System.out.println(doc.get("text"));
 	}
 }

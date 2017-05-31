@@ -1,8 +1,6 @@
 package index;
 
 import java.io.File;
-import java.io.IOException;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
@@ -16,14 +14,14 @@ public class HtmlIndex {
 			htmlDoc = Jsoup.parse(file, Detector.fileCode(file), "");
 			String title = htmlDoc.title();
 			if(title != null)
-				document.add(new TextField("title", title, Field.Store.YES));
+				document.add(new TextField("title", title, Field.Store.NO));
 			if(htmlDoc.body() != null){
 				String body = htmlDoc.body().text();
 				if(body != null)
-					document.add(new TextField("body", body, Field.Store.YES));
+					document.add(new TextField("body", body, Field.Store.NO));
 			}
 			return document;
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;

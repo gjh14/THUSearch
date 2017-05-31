@@ -1,5 +1,6 @@
 package server;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,8 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.SimpleSpanFragmenter;
 import org.wltea.analyzer.lucene.IKAnalyzer;
+
+import index.FileIndex;
 
 public class Lighter {
 	private int MAXLEN = 100;
@@ -38,14 +41,10 @@ public class Lighter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		String name = doc.get("name");
-		String[] token = name.split("\\.");
-		if(token[token.length - 1].equals("html")){
-			tag = doc.get("title");
-			abs = doc.get("body");
-		}else{
-			tag = name;
-			abs = doc.get("text");
+		Document con = FileIndex.getDocument(new File(doc.get("path")));
+		if(con != null){
+			tag = con.get("title") != null ? con.get("title") : doc.get("name");
+			abs = con.get("body") != null ? con.get("body") : con.get("text");
 		}
 	}
 	
@@ -105,10 +104,9 @@ public class Lighter {
 	
 	static public void main(String[] args){
 		Document doc = new Document();
-		doc.add(new StringField("file", "tmp.html", Field.Store.YES));
-		doc.add(new TextField("title", "大家好", Field.Store.YES));
-		doc.add(new TextField("body", "清华大学", Field.Store.YES));
-		Lighter li = new Lighter("华大", doc);
+		doc.add(new StringField("name", "首页.html", Field.Store.YES));
+		doc.add(new TextField("path", "mirror/html/首页.html", Field.Store.YES));
+		Lighter li = new Lighter("清华", doc);
 		System.out.println(li.getTag() + " " + li.getAbs());
 	}
 }
