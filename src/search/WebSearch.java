@@ -50,8 +50,9 @@ public class WebSearch {
 			Query normalQuery = parser.parse(queryString);
 			FunctionQuery pagerankQuery = new FunctionQuery(new PageRankValueScore());
 			FunctionQuery clickQuery = new FunctionQuery(new ClickValueScore());
-			CustomScoreQuery query = new MixScoreQuery(normalQuery, pagerankQuery, clickQuery);  
-			return searcher.search(query, 5);
+//			CustomScoreQuery query = new MixScoreQuery(normalQuery, pagerankQuery, clickQuery);
+			CustomScoreQuery query = new CustomScoreQuery(normalQuery, pagerankQuery); 
+			return searcher.search(normalQuery, 100);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -67,13 +68,13 @@ public class WebSearch {
 		return null;
 	}
 	public static void main(String[] args){ 
-		WebSearch search = new WebSearch("index");
+		WebSearch search = new WebSearch("D:/DProgram/MyEclipse/index");
 		TopDocs results = search.searchQuery("Çå»ª");
 		ScoreDoc[] hits = results.scoreDocs;
 		for (ScoreDoc web : hits) {
 			Document doc = search.getDoc(web.doc);
 			System.out.println("doc=" + web.doc + " score="
-					+ web.score + " title=" + doc.get("title"));
+					+ web.score + " url=" + doc.get("url"));
 		}
 	}
 }

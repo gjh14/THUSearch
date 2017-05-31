@@ -3,7 +3,7 @@
 	request.setCharacterEncoding("utf-8");
 	response.setCharacterEncoding("utf-8");
 	String path = request.getContextPath();
-	String webPath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/input/";
+	String webPath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
 	String currentQuery = (String)request.getAttribute("currentQuery");
 	int maxPage = (Integer)request.getAttribute("maxPage");
 	int currentPage = (Integer)request.getAttribute("currentPage");
@@ -60,14 +60,15 @@
   <br>
   <Table style="left: 0px; width: 594px;">
   <% 
+  	String[] webUrls = (String[]) request.getAttribute("webUrls");
   	String[] webTags = (String[]) request.getAttribute("webTags");
   	String[] webPaths = (String[]) request.getAttribute("webPaths");
   	String[] webAbss = (String[]) request.getAttribute("webAbss");
   	if(webTags != null && webTags.length>0){
   		for(int i = 0; i < webTags.length; i++){
-  			System.out.println(webPath + webPaths[i] + " " + webTags[i]);%>
+  			System.out.println(webUrls[i] + " " + webPaths[i]);%>
   		<p>
-  			<a href=<%=webPath + webPaths[i]%>><%=(currentPage - 1) * 10 + i + 1%>. <%= webTags[i] %></a>
+  			<a href=<%=webUrls[i]%>><%=(currentPage - 1) * 10 + i + 1%>. <%= webTags[i] %></a>
   			 <%= webAbss[i] %>
   		</p>
   		<%}; %>

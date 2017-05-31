@@ -23,7 +23,7 @@ public class ClickValueScore extends FieldCacheSource{
 					return description() + '=' + intVal(doc);
 				}
 				@Override
-				public long longVal(int doc){
+				public float floatVal(int doc){
 					return numericDocValues.get(doc);
 				}
 			};
