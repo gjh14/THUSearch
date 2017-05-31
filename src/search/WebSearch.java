@@ -48,8 +48,9 @@ public class WebSearch {
 		MultiFieldQueryParser parser = new MultiFieldQueryParser(field, analyzer, boosts);
 		try {
 			Query normalQuery = parser.parse(queryString);
-			FunctionQuery rankQuery = new FunctionQuery(new PageRankValueScore());
-			CustomScoreQuery query = new CustomScoreQuery(normalQuery, rankQuery);  
+			FunctionQuery pagerankQuery = new FunctionQuery(new PageRankValueScore());
+			FunctionQuery clickQuery = new FunctionQuery(new ClickValueScore());
+			CustomScoreQuery query = new MixScoreQuery(normalQuery, pagerankQuery, clickQuery);  
 			return searcher.search(query, 5);
 		} catch (Exception e) {
 			e.printStackTrace();
