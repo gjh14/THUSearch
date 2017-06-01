@@ -51,7 +51,7 @@ public class Lighter {
 	static public List<String> getWords(String text){
 		List<String> result = new ArrayList<String>();  
 		TokenStream stream = null;
-		Analyzer analyzer = new IKAnalyzer();
+		Analyzer analyzer = new IKAnalyzer(true);
 		try {
 			stream = analyzer.tokenStream("", text);  
 	        CharTermAttribute attr = stream.addAttribute(CharTermAttribute.class);  

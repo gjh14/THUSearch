@@ -50,8 +50,8 @@ public class WebSearch {
 			Query normalQuery = parser.parse(queryString);
 			FunctionQuery pagerankQuery = new FunctionQuery(new PageRankValueScore());
 			FunctionQuery clickQuery = new FunctionQuery(new ClickValueScore());
-			CustomScoreQuery query = new MixScoreQuery(normalQuery, pagerankQuery, clickQuery);
-//			CustomScoreQuery query = new CustomScoreQuery(normalQuery, pagerankQuery); 
+//			CustomScoreQuery query = new MixScoreQuery(normalQuery, pagerankQuery, clickQuery);
+			CustomScoreQuery query = new CustomScoreQuery(normalQuery, pagerankQuery); 
 			return searcher.search(query, 100);
 		} catch (Exception e) {
 			e.printStackTrace();
