@@ -48,10 +48,11 @@ public class Lighter {
 		}
 	}
 	
-	public List<String> getWords(String text){
+	static public List<String> getWords(String text){
 		List<String> result = new ArrayList<String>();  
-		TokenStream stream = null;  
-		try {  
+		TokenStream stream = null;
+		Analyzer analyzer = new IKAnalyzer();
+		try {
 			stream = analyzer.tokenStream("", text);  
 	        CharTermAttribute attr = stream.addAttribute(CharTermAttribute.class);  
 	        stream.reset();  
@@ -60,7 +61,7 @@ public class Lighter {
 	        }  
 	    } catch (IOException e) {  
 	        e.printStackTrace();  
-	    }finally{  
+	    }finally{
 	        if(stream != null){  
 	            try {  
 	                stream.close();  
@@ -68,7 +69,8 @@ public class Lighter {
 	                e.printStackTrace();  
 	            }  
 	        }  
-	    }  
+	    }
+		analyzer.close();
 	    return result; 
 	}
 	
@@ -103,10 +105,12 @@ public class Lighter {
 	}
 	
 	static public void main(String[] args){
-		Document doc = new Document();
+		/*Document doc = new Document();
 		doc.add(new StringField("name", "首页.html", Field.Store.YES));
 		doc.add(new TextField("path", "mirror/html/首页.html", Field.Store.YES));
 		Lighter li = new Lighter("清华", doc);
-		System.out.println(li.getTag() + " " + li.getAbs());
+		System.out.println(li.getTag() + " " + li.getAbs());*/
+		for(String x : Lighter.getWords("马约翰杯"))
+			System.out.println(x);
 	}
 }
