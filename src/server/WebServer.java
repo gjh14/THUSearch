@@ -60,7 +60,7 @@ public class WebServer extends HttpServlet {
 					abss[i] = lighter.getAbs();
 					urls[i] = doc.get("url");
 					paths[i] = doc.get("path");
-					System.out.println("doc=" + hit.doc + " score=" + hit.score + " tag=" + tags[i]);
+					System.out.println("doc=" + hit.doc + " score=" + hit.score + " url=" + urls[i]);
 				}
 			} else {
 				System.out.println("result null");

@@ -9,7 +9,8 @@ import org.apache.lucene.queries.function.FunctionQuery;
 import org.apache.lucene.search.Query;
 
 public class MixScoreQuery extends CustomScoreQuery{
-	static float MAX_INV_PAGE_RANK = (float)1e6;
+	public static float MAX_INV_PAGE_RANK = (float)1e6;
+	public static float POWER_NUM = 2f;
 			
 	public MixScoreQuery(Query normalQuery, FunctionQuery pagerankQuery, FunctionQuery clickQuery){
 		super(normalQuery, pagerankQuery, clickQuery);
@@ -20,7 +21,9 @@ public class MixScoreQuery extends CustomScoreQuery{
 		return new CustomScoreProvider(context){  
 			@Override
 			public float customScore(int docId, float subQueryScore, float[] valSrcScores){
-				return subQueryScore * (MAX_INV_PAGE_RANK - 1 / valSrcScores[0] + valSrcScores[1]);
+				return subQueryScore *
+						(float) (Math.pow(MAX_INV_PAGE_RANK, POWER_NUM) - 1 /
+								Math.pow(valSrcScores[0], POWER_NUM) + valSrcScores[1]);
 			}
 		};
 	}  

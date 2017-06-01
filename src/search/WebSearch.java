@@ -32,7 +32,7 @@ public class WebSearch {
 		boosts = new HashMap<String, Float>();
 		boosts.put("title", 2.0f);
 		boosts.put("body", 1.0f);
-		boosts.put("text", 1.0f);
+		boosts.put("text", 0.9f);
 		try{
 			Directory dir = FSDirectory.open(new File(indexDir).toPath());
 			reader = DirectoryReader.open(dir);
@@ -50,9 +50,9 @@ public class WebSearch {
 			Query normalQuery = parser.parse(queryString);
 			FunctionQuery pagerankQuery = new FunctionQuery(new PageRankValueScore());
 			FunctionQuery clickQuery = new FunctionQuery(new ClickValueScore());
-//			CustomScoreQuery query = new MixScoreQuery(normalQuery, pagerankQuery, clickQuery);
-			CustomScoreQuery query = new CustomScoreQuery(normalQuery, pagerankQuery); 
-			return searcher.search(normalQuery, 100);
+			CustomScoreQuery query = new MixScoreQuery(normalQuery, pagerankQuery, clickQuery);
+//			CustomScoreQuery query = new CustomScoreQuery(normalQuery, pagerankQuery); 
+			return searcher.search(query, 100);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
