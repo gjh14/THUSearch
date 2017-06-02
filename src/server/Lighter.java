@@ -1,5 +1,6 @@
 package server;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,8 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.SimpleSpanFragmenter;
 import org.wltea.analyzer.lucene.IKAnalyzer;
+
+import index.type.FileIndex;
 
 public class Lighter {
 	private int MAXLEN = 100;
@@ -35,10 +38,9 @@ public class Lighter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//Document con = FileIndex.getDocument(new File(doc.get("path")));
-		Document con = doc; 
+		Document con = FileIndex.getDocument(new File(doc.get("path")));
 		if(con != null){
-			tag = con.get("title") != null ? con.get("title") : doc.get("name");
+			tag = con.get("entry");
 			abs = con.get("body") != null ? con.get("body") : con.get("text");
 		}
 	}

@@ -20,7 +20,7 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 import index.type.FileIndex;
 
 public class WebIndex {
-	static public String INDEXDIR = "D:/Program Files/MyEclipse 2017 CI/index";
+	static public String INDEXDIR = "D:/workspace/mirror__4/index";
 	 
     private Directory dir;
     private IndexWriterConfig iwc;
@@ -35,27 +35,44 @@ public class WebIndex {
     	}
     }
 
+	public void makeEntry(Document doc, String[] parts){
+		doc.add(new StringField("url", parts[0], Field.Store.YES));
+		doc.add(new FloatDocValuesField("pagerank", Float.parseFloat(parts[1])));
+		String archor = "";
+		String entry = doc.get("title") != null ? doc.get("title") : "";
+		for(int i = 2; i < parts.length; ++i){
+			archor += parts[i] + " ";
+			if(parts[i].length() < 64 && parts[i].length() > entry.length())
+				entry = parts[i];
+		}
+		if(entry.equals(""))
+			entry = parts[0];
+		doc.add(new StringField("archor", archor, Field.Store.NO));
+		doc.add(new StringField("entry", entry, Field.Store.YES));
+	}
+	
 	public void buildIndex(String path){
 		int cnt = 0;
 		try{
 			IndexWriter indexWriter = new IndexWriter(dir,iwc);
-			BufferedReader reader = new BufferedReader(new FileReader(new File(path + "data.txt")));
+			indexWriter.deleteAll();
+			BufferedReader reader = new BufferedReader(new FileReader(
+					new File(path + "allinfo.txt")));
 			for(String line; (line = reader.readLine()) != null;){
 				if(cnt++ < indexWriter.maxDoc())
 					continue;
 				if(cnt % 1000 == 0)
 					System.out.println("Count " + cnt);
 				String[] parts = line.split("\t");
-				File file = new File(path + parts[1]);
+				File file = new File(path + parts[0]);
 				Document doc = FileIndex.getDocument(file);
 				if(doc == null){
-					System.err.println(cnt + " " + parts[0] + " " + parts[1] + " " + parts[2]);
+					System.err.println(cnt + " " + parts[0] + " " + parts[1]);
 					continue;
 				}
-				doc.add(new StringField("url", parts[0], Field.Store.YES));
+				makeEntry(doc, parts);
 				doc.add(new StringField("name", file.getName(), Field.Store.YES));
 				doc.add(new StringField("path", file.getAbsolutePath(), Field.Store.YES));
-				doc.add(new FloatDocValuesField("pagerank", Float.parseFloat(parts[2])));
 				doc.add(new NumericDocValuesField("click", 0));
 				indexWriter.addDocument(doc);
 			}
@@ -68,6 +85,6 @@ public class WebIndex {
 	
 	public static void main(String[] args){
 		WebIndex index = new WebIndex();
-		index.buildIndex("D:/workspace/mirror__3/");
+		index.buildIndex("D:/workspace/mirror__4/");
 	}
 }

@@ -33,7 +33,8 @@ public class PDFIndex{
 	}
 	
 	public static void main(String[] args){
-		File file = new File("mirror/pdf/hoti2012_parasplit.pdf");
+		File file = new File("D:/workspace/mirror__4/news.tsinghua.edu.cn/publish"
+				+ "/thunewsen/9707/9707/1464156730748.pdf");
 		Document doc = getDocument(file);
 		System.out.println(doc.get("text"));
 	}

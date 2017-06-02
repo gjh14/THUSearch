@@ -71,7 +71,7 @@ public class HrefAnalyzer {
 			for (Element link : links) {
 				String linkHref = link.attr("href");
 				String linkText = link.text().trim();
-				if (!linkHref.equals("") && !linkText.equals("")  && !linkHref.equals("#")
+				if (!linkHref.equals("") && !linkHref.equals("#")
 						&& !linkHref.startsWith("mailto:") && !linkHref.startsWith("javascript:")) {
 					//System.out.println(web + " " + linkHref + " " + linkText);
 					String wholePath = null;

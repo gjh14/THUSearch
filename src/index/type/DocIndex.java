@@ -30,7 +30,8 @@ public class DocIndex {
 	}
 	
 	public static void main(String[] args){
-		File file = new File("mirror/doc/G172560075.doc");
+		File file = new File("D:/workspace/mirror__4/news.tsinghua.edu.cn"
+				+ "/news/ASEE.doc");
 		Document doc = getDocument(file);
 		System.out.println(doc.get("text"));
 	}
