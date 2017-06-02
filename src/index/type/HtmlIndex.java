@@ -1,10 +1,12 @@
-package index;
+package index.type;
 
 import java.io.File;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
 import org.jsoup.Jsoup;
+
+import index.Detector;
 
 public class HtmlIndex {
 	public static Document getDocument(File file){

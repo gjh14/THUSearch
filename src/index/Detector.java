@@ -27,7 +27,7 @@ public class Detector {
 		try {
 			URL url = file.toURI().toURL();
 			Charset charset = detector.detectCodepage(url);
-			return charset.name();
+			return charset.name().equals("void") ? "utf-8" : charset.name();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -38,7 +38,7 @@ public class Detector {
 		try{
 			InputStream in = new ByteArrayInputStream(text.getBytes());
 			Charset charset = detector.detectCodepage(in, text.getBytes().length);
-			return charset.name() != "void" ? charset.name() : "gbk";
+			return charset.name().equals("void") ? "utf-8" : charset.name();
 		}catch(Exception e){
 			e.printStackTrace();
 		}

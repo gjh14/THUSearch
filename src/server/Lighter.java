@@ -20,7 +20,7 @@ import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.SimpleSpanFragmenter;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
-import index.FileIndex;
+import index.type.FileIndex;
 
 public class Lighter {
 	private int MAXLEN = 100;
@@ -30,7 +30,7 @@ public class Lighter {
 	private String tag, abs;
 	
 	public Lighter(String queryString, Document doc){
-		analyzer = new IKAnalyzer();
+		analyzer = new IKAnalyzer(true);
 		SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter(  
 				"<font color=\"#FF0000\">", "</font>");
 		try {
@@ -41,7 +41,8 @@ public class Lighter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Document con = FileIndex.getDocument(new File(doc.get("path")));
+		//Document con = FileIndex.getDocument(new File(doc.get("path")));
+		Document con = doc; 
 		if(con != null){
 			tag = con.get("title") != null ? con.get("title") : doc.get("name");
 			abs = con.get("body") != null ? con.get("body") : con.get("text");
@@ -78,7 +79,7 @@ public class Lighter {
 		TokenStream tokenStream = analyzer.tokenStream("", tag);
 		try {
 			String css = highlighter.getBestFragment(tokenStream, tag);
-			System.out.println(tag + ": " + css);
+//			System.out.println(tag + ": " + css);
 			String end = tag.length() > MAXLEN ? "..." : "";
 			if(css == null)
 				css = tag.length() > MAXLEN ? tag.substring(0, MAXLEN) : tag;
@@ -93,7 +94,7 @@ public class Lighter {
 		TokenStream tokenStream = analyzer.tokenStream("", abs);
 		try {
 			String css = highlighter.getBestFragment(tokenStream, abs);
-			System.out.println(abs + ": " + css);
+//			System.out.println(abs + ": " + css);
 			String end = abs.length() > MAXLEN ? "..." : "";
 			if(css == null)
 				css = abs.length() > MAXLEN ? abs.substring(0, MAXLEN) : abs;

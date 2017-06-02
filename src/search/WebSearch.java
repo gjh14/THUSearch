@@ -28,7 +28,7 @@ public class WebSearch {
 	private static String[] field = new String[]{"title", "body", "text"};
 
 	public WebSearch(String indexDir){		
-		analyzer = new IKAnalyzer();
+		analyzer = new IKAnalyzer(true);
 		boosts = new HashMap<String, Float>();
 		boosts.put("title", 2.0f);
 		boosts.put("body", 1.0f);
@@ -49,7 +49,7 @@ public class WebSearch {
 		try {
 			Query normalQuery = parser.parse(queryString);
 			FunctionQuery pagerankQuery = new FunctionQuery(new PageRankValueScore());
-			FunctionQuery clickQuery = new FunctionQuery(new ClickValueScore());
+//			FunctionQuery clickQuery = new FunctionQuery(new ClickValueScore());
 //			CustomScoreQuery query = new MixScoreQuery(normalQuery, pagerankQuery, clickQuery);
 			CustomScoreQuery query = new CustomScoreQuery(normalQuery, pagerankQuery); 
 			return searcher.search(query, 100);

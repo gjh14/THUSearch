@@ -1,4 +1,4 @@
-package index;
+package index.type;
 
 import java.io.File;
 

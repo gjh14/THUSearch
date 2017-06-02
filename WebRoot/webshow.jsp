@@ -46,14 +46,15 @@
 
 <body>
 <div id="Layer1">
-  <form id="form1" name="form1" method="get" action="THUServer">
-    <label>
-      <input name="query" value="<%=currentQuery%>" type="text" size="70" />
-    </label>
-    <label>
-    <input type="submit" name="Submit" value="查询" />
-    </label>
-  </form>
+	<form id="form1" name="form1" method="get" action="THUServer">
+	<label>
+		<input name="query" value="<%=currentQuery%>" type="text" size="70" />
+	</label>
+	<label>
+		<input type="submit" name="submit" value="Search" />
+		<a herf="THUServer?submit=more&query=<%=currentQuery%>">更多结果</a>
+	</label>
+	</form>
 </div>
 <div id="Layer2" style="top: 82px; height: 585px;">
   <div id="webdiv">结果显示如下：

@@ -1,6 +1,7 @@
 package server;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -26,10 +27,27 @@ public class WebServer extends HttpServlet {
 		super.destroy();
 	}
 
+	public void doSearch(HttpServletRequest request, HttpServletResponse response){
+		
+	}
+	
+	public void doLink(HttpServletRequest request, HttpServletResponse response){ 
+		
+	}
+	
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html;charset=utf-8");
 		request.setCharacterEncoding("utf-8");
+		
+		Enumeration<String> names = request.getParameterNames();
+		System.err.println(names);
+		for(String name; names.hasMoreElements();){
+			name = names.nextElement();
+			System.err.println(name + " " + request.getParameter(name));
+		}
+		
+		
 		String queryString = request.getParameter("query");
 		String pageString = request.getParameter("page");
 

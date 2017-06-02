@@ -18,6 +18,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
+import index.type.FileIndex;
+
 public class WebIndex {
 	private Analyzer analyzer; 
     private Directory dir;
