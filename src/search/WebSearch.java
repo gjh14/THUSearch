@@ -28,15 +28,15 @@ public class WebSearch {
 	private IndexWriter writer;
 	private IndexSearcher searcher;
 	
-	private static String[] field = new String[]{"title", "body", "text", "archor", "keywords"};
+	private static String[] field = new String[]{"entry", "body", "text", "archor", "keywords"};
 	static private Map<String, Float> boosts;
 	static{
 		boosts = new HashMap<String, Float>();
-		boosts.put("title", 2.0f);
+		boosts.put("entry", 60.0f);
 		boosts.put("body", 1.0f);
 		boosts.put("text", 1.0f);
-		boosts.put("archor", 4.0f);
-		boosts.put("keywords", 4.0f);
+		boosts.put("archor", 40.0f);
+		boosts.put("keywords", 20.0f);
 	}
 
 	public WebSearch(){		

@@ -72,7 +72,7 @@
 				System.out.println(webUrls[i] + " " + webPaths[i]);
 				%>
 				<p>
-					<a href="THUServer?tag=link&doc=<%=webDocs[i]%>">
+					<a href="THUServer?tag=link&doc=<%=webDocs[i]%>" target="_blank">
 						<%=(currentPage - 1) * 10 + i + 1%>. <%=webEntrys[i]%>
 					</a>
 					<br/>

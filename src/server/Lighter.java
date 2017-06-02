@@ -102,7 +102,7 @@ public class Lighter {
 	}
 	
 	static public void main(String[] args){
-		for(String x : Lighter.getWords("清华人", true))
+		for(String x : Lighter.getWords("大学新闻", true))
 			System.out.println(x);
 	}
 }

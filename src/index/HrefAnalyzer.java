@@ -184,7 +184,7 @@ public class HrefAnalyzer {
 					}
 					if (unique) {
 						candi.add(archorMap.get(i).get(j)
-								.replaceAll("\t", "").replaceAll(" ", "")
+								.replaceAll("\t", "")
 								.replaceAll("\n", "").replaceAll("\r", "")
 								.replaceAll("\\?", "")
 								);
