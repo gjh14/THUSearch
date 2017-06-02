@@ -24,6 +24,7 @@ public class WebServer extends HttpServlet {
 
 	@Override
 	public void destroy() {
+		search.close();
 		super.destroy();
 	}
 

@@ -9,11 +9,16 @@ import org.apache.lucene.queries.function.FunctionQuery;
 import org.apache.lucene.search.Query;
 
 public class MixScoreQuery extends CustomScoreQuery{
-	public static float MAX_INV_PAGE_RANK = (float)1e6;
-	public static float POWER_NUM = 2f;
-			
-	public MixScoreQuery(Query normalQuery, FunctionQuery pagerankQuery, FunctionQuery clickQuery){
-		super(normalQuery, pagerankQuery, clickQuery);
+	static double cyc = 500;
+	static double ratio = 1000;
+	static double exp = 0.5;
+	
+	int tot, sum;
+	
+	public MixScoreQuery(Query q0, FunctionQuery q1, FunctionQuery q2, int tot, int sum){
+		super(q0, q1, q2);
+		this.tot = tot;
+		this.sum = sum;
 	}
 	
 	@Override 
@@ -21,9 +26,11 @@ public class MixScoreQuery extends CustomScoreQuery{
 		return new CustomScoreProvider(context){  
 			@Override
 			public float customScore(int docId, float subQueryScore, float[] valSrcScores){
-				return subQueryScore *
-						(float) (Math.pow(MAX_INV_PAGE_RANK, POWER_NUM) - 1 /
-								Math.pow(valSrcScores[0], POWER_NUM) + valSrcScores[1]);
+				double bm25 = subQueryScore;
+				double pagerank = valSrcScores[0];
+				double click = valSrcScores[1];
+				double newrank = (cyc * tot * pagerank + click * ratio)/(cyc * tot + ratio * sum);
+				return (float)(bm25 * Math.pow(newrank, exp));
 			}
 		};
 	}  
