@@ -27,14 +27,19 @@ public class WebSearch {
 	private IndexReader reader;
 	private IndexWriter writer;
 	private IndexSearcher searcher;
-	private Map<String, Float> boosts;
-	private static String[] field = new String[]{"title", "body", "text"};
-
-	public WebSearch(){		
+	
+	private static String[] field = new String[]{"title", "body", "text", "archor", "keywords"};
+	static private Map<String, Float> boosts;
+	static{
 		boosts = new HashMap<String, Float>();
 		boosts.put("title", 2.0f);
 		boosts.put("body", 1.0f);
-		boosts.put("text", 0.9f);
+		boosts.put("text", 1.0f);
+		boosts.put("archor", 4.0f);
+		boosts.put("keywords", 4.0f);
+	}
+
+	public WebSearch(){		
 		try{
 			Directory dir = FSDirectory.open(new File(WebIndex.INDEXDIR).toPath());
 			reader = DirectoryReader.open(dir);
@@ -74,7 +79,6 @@ public class WebSearch {
 	}
 	
 	public Document clickDoc(int docid){
-		System.err.println("Click" + docid);
 		return getDoc(docid);
 	}
 	

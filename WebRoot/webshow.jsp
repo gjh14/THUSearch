@@ -64,19 +64,19 @@
 		<% 
 		int[] webDocs = (int[]) request.getAttribute("webDocs");
 		String[] webUrls = (String[]) request.getAttribute("webUrls");
-		String[] webTags = (String[]) request.getAttribute("webTags");
+		String[] webEntrys = (String[]) request.getAttribute("webEntrys");
 		String[] webPaths = (String[]) request.getAttribute("webPaths");
-		String[] webAbss = (String[]) request.getAttribute("webAbss");
-		if(webTags != null && webTags.length>0){
-			for(int i = 0; i < webTags.length; i++){
+		String[] webAbsts = (String[]) request.getAttribute("webAbsts");
+		if(webEntrys != null && webEntrys.length>0){
+			for(int i = 0; i < webEntrys.length; i++){
 				System.out.println(webUrls[i] + " " + webPaths[i]);
 				%>
 				<p>
 					<a href="THUServer?tag=link&doc=<%=webDocs[i]%>">
-						<%=(currentPage - 1) * 10 + i + 1%>. <%=webTags[i]%>
+						<%=(currentPage - 1) * 10 + i + 1%>. <%=webEntrys[i]%>
 					</a>
 					<br/>
-					<%= webAbss[i] %>
+					<%= webAbsts[i] %>
 				</p>
 	  		<%}; %>
 	  	<%}else{%>

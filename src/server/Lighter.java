@@ -24,7 +24,7 @@ public class Lighter {
 	
 	private Analyzer analyzer;
 	private Highlighter highlighter;
-	private String tag, abs;
+	private String entry, abst;
 	
 	public Lighter(String queryString, Document doc, boolean flag){
 		analyzer = new IKAnalyzer(flag);
@@ -38,17 +38,17 @@ public class Lighter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		entry = doc.get("entry");
 		Document con = FileIndex.getDocument(new File(doc.get("path")));
-		if(con != null){
-			tag = con.get("entry");
-			abs = con.get("body") != null ? con.get("body") : con.get("text");
-		}
+		if(con != null)
+			abst = con.get("body") != null ? con.get("body") : con.get("text");
+//		System.out.println(entry + " " + abst);
 	}
 	
-	static public List<String> getWords(String text){
+	static public List<String> getWords(String text, boolean flag){
 		List<String> result = new ArrayList<String>();  
 		TokenStream stream = null;
-		Analyzer analyzer = new IKAnalyzer(false);
+		Analyzer analyzer = new IKAnalyzer(flag);
 		try {
 			stream = analyzer.tokenStream("", text);  
 	        CharTermAttribute attr = stream.addAttribute(CharTermAttribute.class);  
@@ -71,14 +71,14 @@ public class Lighter {
 	    return result; 
 	}
 	
-	public String getTag(){
-		TokenStream tokenStream = analyzer.tokenStream("", tag);
+	public String getEntry(){
+		TokenStream tokenStream = analyzer.tokenStream("", entry);
 		try {
-			String css = highlighter.getBestFragment(tokenStream, tag);
-			System.out.println(tag + ": " + css);
-			String end = tag.length() > MAXLEN ? "..." : "";
+			String css = highlighter.getBestFragment(tokenStream, entry);
+//			System.out.println(entry + ": " + css);
+			String end = entry.length() > MAXLEN ? "..." : "";
 			if(css == null)
-				css = tag.length() > MAXLEN ? tag.substring(0, MAXLEN) : tag;
+				css = entry.length() > MAXLEN ? entry.substring(0, MAXLEN) : entry;
 			return css + end;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -86,14 +86,14 @@ public class Lighter {
 		return null;
 	}
 	
-	public String getAbs(){
-		TokenStream tokenStream = analyzer.tokenStream("", abs);
+	public String getAbst(){
+		TokenStream tokenStream = analyzer.tokenStream("", abst);
 		try {
-			String css = highlighter.getBestFragment(tokenStream, abs);
-			System.out.println(abs + ": " + css);
-			String end = abs.length() > MAXLEN ? "..." : "";
+			String css = highlighter.getBestFragment(tokenStream, abst);
+//			System.out.println(abst + ": " + css);
+			String end = abst.length() > MAXLEN ? "..." : "";
 			if(css == null)
-				css = abs.length() > MAXLEN ? abs.substring(0, MAXLEN) : abs;
+				css = abst.length() > MAXLEN ? abst.substring(0, MAXLEN) : abst;
 			return css + end;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -102,7 +102,7 @@ public class Lighter {
 	}
 	
 	static public void main(String[] args){
-		for(String x : Lighter.getWords("清华大学"))
+		for(String x : Lighter.getWords("清华人", true))
 			System.out.println(x);
 	}
 }

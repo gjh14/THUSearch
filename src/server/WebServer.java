@@ -41,8 +41,8 @@ public class WebServer extends HttpServlet {
 			TopDocs results = search.searchQuery(queryString, flag);
 			int[] docs = null;
 			String[] urls = null;
-			String[] tags = null;
-			String[] abss = null;
+			String[] entrys = null;
+			String[] absts = null;
 			String[] paths = null;
 			if (results != null && results.scoreDocs.length > 0) {
 				ScoreDoc[] hits = results.scoreDocs;
@@ -50,16 +50,16 @@ public class WebServer extends HttpServlet {
 				int len = Math.min(10, hits.length - (page - 1) * 10);
 				docs = new int[len];
 				urls = new String[len];
-				tags = new String[len];
-				abss = new String[len];
+				entrys = new String[len];
+				absts = new String[len];
 				paths = new String[len];
 				for (int i = 0; i < len; ++i) {
 					ScoreDoc hit = hits[10 * (page - 1) + i];
 					Document doc = search.getDoc(hit.doc); 
 					Lighter lighter = new Lighter(queryString, doc, flag);
 					docs[i] = hit.doc;
-					tags[i] = lighter.getTag();
-					abss[i] = lighter.getAbs();
+					entrys[i] = lighter.getEntry();
+					absts[i] = lighter.getAbst();
 					urls[i] = doc.get("url");
 					paths[i] = doc.get("path");
 					System.out.println("doc=" + hit.doc + " score=" + hit.score + " url=" + urls[i]);
@@ -74,8 +74,8 @@ public class WebServer extends HttpServlet {
 			request.setAttribute("currentPage", page);
 			request.setAttribute("webDocs", docs);
 			request.setAttribute("webUrls", urls);
-			request.setAttribute("webTags", tags);
-			request.setAttribute("webAbss", abss);
+			request.setAttribute("webEntrys", entrys);
+			request.setAttribute("webAbsts", absts);
 			request.setAttribute("webPaths", paths);
 			request.getRequestDispatcher("/webshow.jsp").forward(request, response);
 		}		
@@ -84,27 +84,29 @@ public class WebServer extends HttpServlet {
 	public void doLink(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 		int docid = Integer.parseInt(request.getParameter("doc"));
 		Document doc = search.clickDoc(docid);
-		System.out.println("GetDoc " + docid + " " + doc.get("file"));
-		request.getRequestDispatcher(doc.get("file")).forward(request, response);
+		System.out.println("GetDoc " + docid + " " + doc.get("url"));
+		String url = "http://" + doc.get("url");
+		response.sendRedirect(url);
 	}
 	
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html;charset=utf-8");
 		request.setCharacterEncoding("utf-8");
-		
-		switch(request.getParameter("tag")){
-		case "search":
-			doSearch(request, response, true);
-			break;
-		case "more":
-			doSearch(request, response, false);
-			break;
-		case "link":
-			doLink(request, response);
-			break;
-		default:
-		}
+		String tag = request.getParameter("tag");
+		if(tag != null)
+			switch(tag){
+				case "search":
+					doSearch(request, response, true);
+					break;
+				case "more":
+					doSearch(request, response, false);
+					break;
+				case "link":
+					doLink(request, response);
+					break;
+				default:
+				}
 	}
 
 	@Override
