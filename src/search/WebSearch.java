@@ -4,10 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queries.CustomScoreQuery;
 import org.apache.lucene.queries.function.FunctionQuery;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -20,38 +21,42 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
+import index.WebIndex;
+
 public class WebSearch {
 	private IndexReader reader;
+	private IndexWriter writer;
 	private IndexSearcher searcher;
-	private Analyzer analyzer;
 	private Map<String, Float> boosts;
 	private static String[] field = new String[]{"title", "body", "text"};
 
-	public WebSearch(String indexDir){		
-		analyzer = new IKAnalyzer(true);
+	public WebSearch(){		
 		boosts = new HashMap<String, Float>();
 		boosts.put("title", 2.0f);
 		boosts.put("body", 1.0f);
 		boosts.put("text", 0.9f);
 		try{
-			Directory dir = FSDirectory.open(new File(indexDir).toPath());
+			Directory dir = FSDirectory.open(new File(WebIndex.INDEXDIR).toPath());
 			reader = DirectoryReader.open(dir);
 			searcher = new IndexSearcher(reader);
 			searcher.setSimilarity(new BM25Similarity());
+			
+			IndexWriterConfig iwc = new IndexWriterConfig(new IKAnalyzer(false));
+			iwc.setSimilarity(new BM25Similarity());
+			writer = new IndexWriter(dir,iwc);
 		}catch(IOException e){
 			e.printStackTrace();
 		}
 	}
 	
-	public TopDocs searchQuery(String queryString){
+	public TopDocs searchQuery(String queryString, boolean flag){
 		System.out.println("query=" + queryString);
-		MultiFieldQueryParser parser = new MultiFieldQueryParser(field, analyzer, boosts);
+		MultiFieldQueryParser parser = new MultiFieldQueryParser(field, new IKAnalyzer(flag), boosts);
 		try {
 			Query normalQuery = parser.parse(queryString);
 			FunctionQuery pagerankQuery = new FunctionQuery(new PageRankValueScore());
-//			FunctionQuery clickQuery = new FunctionQuery(new ClickValueScore());
-//			CustomScoreQuery query = new MixScoreQuery(normalQuery, pagerankQuery, clickQuery);
-			CustomScoreQuery query = new CustomScoreQuery(normalQuery, pagerankQuery); 
+			FunctionQuery clickQuery = new FunctionQuery(new ClickValueScore());
+			CustomScoreQuery query = new MixScoreQuery(normalQuery, pagerankQuery, clickQuery); 
 			return searcher.search(query, 100);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -59,17 +64,23 @@ public class WebSearch {
 		return null;
 	}
 	
-	public Document getDoc(int doc) {
+	public Document getDoc(int docid) {
 		try {
-			return searcher.doc(doc);
+			return searcher.doc(docid);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
+	
+	public Document clickDoc(int docid){
+		System.err.println("Click" + docid);
+		return getDoc(docid);
+	}
+	
 	public static void main(String[] args){ 
-		WebSearch search = new WebSearch("D:/DProgram/MyEclipse/index");
-		TopDocs results = search.searchQuery("清华");
+		WebSearch search = new WebSearch();
+		TopDocs results = search.searchQuery("清华", true);
 		ScoreDoc[] hits = results.scoreDocs;
 		for (ScoreDoc web : hits) {
 			Document doc = search.getDoc(web.doc);

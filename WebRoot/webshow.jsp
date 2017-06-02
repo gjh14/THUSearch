@@ -4,9 +4,10 @@
 	response.setCharacterEncoding("utf-8");
 	String path = request.getContextPath();
 	String webPath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
+	String currentTag = (String)request.getAttribute("currentTag");
 	String currentQuery = (String)request.getAttribute("currentQuery");
 	int maxPage = (Integer)request.getAttribute("maxPage");
-	int currentPage = (Integer)request.getAttribute("currentPage");
+	int currentPage = (Integer)request.getAttribute("currentPage"); 
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -52,49 +53,56 @@
 	</label>
 	<label>
 		<input type="submit" name="submit" value="Search" />
-		<a herf="THUServer?submit=more&query=<%=currentQuery%>">更多结果</a>
+		<input name ="tag" value="search" style="display:none"/>
+		<a href="THUServer?tag=more&query=<%=currentQuery%>">更多结果</a>
 	</label>
 	</form>
 </div>
 <div id="Layer2" style="top: 82px; height: 585px;">
-  <div id="webdiv">结果显示如下：
-  <br>
-  <Table style="left: 0px; width: 594px;">
-  <% 
-  	String[] webUrls = (String[]) request.getAttribute("webUrls");
-  	String[] webTags = (String[]) request.getAttribute("webTags");
-  	String[] webPaths = (String[]) request.getAttribute("webPaths");
-  	String[] webAbss = (String[]) request.getAttribute("webAbss");
-  	if(webTags != null && webTags.length>0){
-  		for(int i = 0; i < webTags.length; i++){
-  			System.out.println(webUrls[i] + " " + webPaths[i]);%>
-  		<p>
-  			<a href=<%=webUrls[i]%>><%=(currentPage - 1) * 10 + i + 1%>. <%= webTags[i] %></a>
-  			 <%= webAbss[i] %>
-  		</p>
-  		<%}; %>
-  	<%}else{ %>
-  		<p><tr><h3>no such result</h3></tr></p>
-  	<%}; %>
-  </Table>
-  </div>
-  <div>
+	<div id="webdiv">结果显示如下：
+		<Table style="left: 0px; width: 594px;">
+		<% 
+		int[] webDocs = (int[]) request.getAttribute("webDocs");
+		String[] webUrls = (String[]) request.getAttribute("webUrls");
+		String[] webTags = (String[]) request.getAttribute("webTags");
+		String[] webPaths = (String[]) request.getAttribute("webPaths");
+		String[] webAbss = (String[]) request.getAttribute("webAbss");
+		if(webTags != null && webTags.length>0){
+			for(int i = 0; i < webTags.length; i++){
+				System.out.println(webUrls[i] + " " + webPaths[i]);
+				%>
+				<p>
+					<a href="THUServer?tag=link&doc=<%=webDocs[i]%>">
+						<%=(currentPage - 1) * 10 + i + 1%>. <%=webTags[i]%>
+					</a>
+					<br/>
+					<%= webAbss[i] %>
+				</p>
+	  		<%}; %>
+	  	<%}else{%>
+	  		<p><tr><h3>no such result</h3></tr></p>
+	  	<%}; %>
+	 	</Table>
+	</div>
+	<div>
   	<p>
-		<%if(currentPage > 1){ %>
-			<a href="THUServer?query=<%=currentQuery%>&page=<%=currentPage - 1%>">上一页</a>
+		<%
+		String server = "THUServer?tag=" + currentTag + "&query=" + currentQuery;
+		if(currentPage > 1){ %>
+			<a href="<%=server%>&page=<%=currentPage - 1%>">上一页</a>
 		<%}; %>
 		<%for (int i = Math.max(1, currentPage - 5); i < currentPage; i++){%>
-			<a href="THUServer?query=<%=currentQuery%>&page=<%=i%>"><%=i%></a>
+			<a href="<%=server%>&page=<%=i%>"><%=i%></a>
 		<%}; %>
 		<strong><%=currentPage%></strong>
 		<%for (int i=currentPage + 1; i <= Math.min(maxPage, currentPage + 5); i++){ %>
-			<a href="THUServer?query=<%=currentQuery%>&page=<%=i%>"><%=i%></a>
+			<a href="<%=server%>&page=<%=i%>"><%=i%></a>
 		<%}; %>
 		<%if(currentPage < maxPage){ %>
-			<a href="THUServer?query=<%=currentQuery%>&page=<%=currentPage + 1%>">下一页</a>
+			<a href="<%=server%>&page=<%=currentPage + 1%>">下一页</a>
 		<%}; %>
 	</p>
-  </div>
+	</div>
 </div>
 <div id="Layer3" style="top: 839px; left: 27px;">
 	

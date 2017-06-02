@@ -19,7 +19,7 @@ public class WebServer extends HttpServlet {
 
 	public WebServer() {
 		super();
-		search = new WebSearch("index");
+		search = new WebSearch();
 	}
 
 	@Override
@@ -27,27 +27,8 @@ public class WebServer extends HttpServlet {
 		super.destroy();
 	}
 
-	public void doSearch(HttpServletRequest request, HttpServletResponse response){
-		
-	}
-	
-	public void doLink(HttpServletRequest request, HttpServletResponse response){ 
-		
-	}
-	
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/html;charset=utf-8");
-		request.setCharacterEncoding("utf-8");
-		
-		Enumeration<String> names = request.getParameterNames();
-		System.err.println(names);
-		for(String name; names.hasMoreElements();){
-			name = names.nextElement();
-			System.err.println(name + " " + request.getParameter(name));
-		}
-		
-		
+	public void doSearch(HttpServletRequest request, HttpServletResponse response, boolean flag)
+			throws ServletException, IOException{
 		String queryString = request.getParameter("query");
 		String pageString = request.getParameter("page");
 
@@ -57,7 +38,8 @@ public class WebServer extends HttpServlet {
 			System.out.println("null query");
 		else {
 			System.out.println(queryString);
-			TopDocs results = search.searchQuery(queryString);
+			TopDocs results = search.searchQuery(queryString, flag);
+			int[] docs = null;
 			String[] urls = null;
 			String[] tags = null;
 			String[] abss = null;
@@ -66,14 +48,16 @@ public class WebServer extends HttpServlet {
 				ScoreDoc[] hits = results.scoreDocs;
 				maxpage = (hits.length - 1) / 10 + 1;
 				int len = Math.min(10, hits.length - (page - 1) * 10);
+				docs = new int[len];
 				urls = new String[len];
 				tags = new String[len];
 				abss = new String[len];
 				paths = new String[len];
 				for (int i = 0; i < len; ++i) {
 					ScoreDoc hit = hits[10 * (page - 1) + i];
-					Document doc = search.getDoc(hit.doc);
-					Lighter lighter = new Lighter(queryString, doc);
+					Document doc = search.getDoc(hit.doc); 
+					Lighter lighter = new Lighter(queryString, doc, flag);
+					docs[i] = hit.doc;
 					tags[i] = lighter.getTag();
 					abss[i] = lighter.getAbs();
 					urls[i] = doc.get("url");
@@ -84,14 +68,42 @@ public class WebServer extends HttpServlet {
 				System.out.println("result null");
 			}
 
+			request.setAttribute("currentTag", flag ? "search" : "more");
 			request.setAttribute("currentQuery", queryString);
-			request.setAttribute("currentPage", page);
 			request.setAttribute("maxPage", maxpage);
+			request.setAttribute("currentPage", page);
+			request.setAttribute("webDocs", docs);
 			request.setAttribute("webUrls", urls);
 			request.setAttribute("webTags", tags);
 			request.setAttribute("webAbss", abss);
 			request.setAttribute("webPaths", paths);
 			request.getRequestDispatcher("/webshow.jsp").forward(request, response);
+		}		
+	}
+	
+	public void doLink(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+		int docid = Integer.parseInt(request.getParameter("doc"));
+		Document doc = search.clickDoc(docid);
+		System.out.println("GetDoc " + docid + " " + doc.get("file"));
+		request.getRequestDispatcher(doc.get("file")).forward(request, response);
+	}
+	
+	@Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setContentType("text/html;charset=utf-8");
+		request.setCharacterEncoding("utf-8");
+		
+		switch(request.getParameter("tag")){
+		case "search":
+			doSearch(request, response, true);
+			break;
+		case "more":
+			doSearch(request, response, false);
+			break;
+		case "link":
+			doLink(request, response);
+			break;
+		default:
 		}
 	}
 
