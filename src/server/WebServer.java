@@ -97,8 +97,6 @@ public class WebServer extends HttpServlet {
 		if(tag != null)
 			switch(tag){
 				case "search":
-					doSearch(request, response, true);
-					break;
 				case "more":
 					doSearch(request, response, false);
 					break;

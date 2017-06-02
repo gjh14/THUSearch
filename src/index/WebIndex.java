@@ -10,6 +10,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FloatDocValuesField;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.similarities.BM25Similarity;
@@ -36,8 +37,6 @@ public class WebIndex {
     }
 
 	public void makeEntry(Document doc, String[] parts){
-		doc.add(new StringField("url", parts[0], Field.Store.YES));
-		doc.add(new FloatDocValuesField("pagerank", Float.parseFloat(parts[1])));
 		String archor = "";
 		String entry = doc.get("title") != null ? doc.get("title") : "";
 		for(int i = 2; i < parts.length; ++i){
@@ -47,8 +46,8 @@ public class WebIndex {
 		}
 		if(entry.equals(""))
 			entry = parts[0];
-		doc.add(new StringField("archor", archor, Field.Store.NO));
-		doc.add(new StringField("entry", entry, Field.Store.YES));
+		doc.add(new TextField("archor", archor, Field.Store.NO));
+		doc.add(new TextField("entry", entry, Field.Store.YES));
 	}
 	
 	public void buildIndex(String path){
@@ -73,6 +72,8 @@ public class WebIndex {
 				makeEntry(doc, parts);
 				doc.add(new StringField("name", file.getName(), Field.Store.YES));
 				doc.add(new StringField("path", file.getAbsolutePath(), Field.Store.YES));
+				doc.add(new StringField("url", parts[0], Field.Store.YES));
+				doc.add(new FloatDocValuesField("pagerank", Float.parseFloat(parts[1])));
 				doc.add(new NumericDocValuesField("click", 0));
 				indexWriter.addDocument(doc);
 			}
