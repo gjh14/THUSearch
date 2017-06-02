@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FloatDocValuesField;
@@ -21,14 +20,15 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 import index.type.FileIndex;
 
 public class WebIndex {
-	private Analyzer analyzer; 
+	static public String INDEXDIR = "D:/Program Files/MyEclipse 2017 CI/index";
+	 
     private Directory dir;
     private IndexWriterConfig iwc;
-	public WebIndex(String indexDir){
-		analyzer = new IKAnalyzer();
+    
+	public WebIndex(){
 		try{
-			dir = FSDirectory.open(new File(indexDir).toPath());
-			iwc = new IndexWriterConfig(analyzer);
+			dir = FSDirectory.open(new File(INDEXDIR).toPath());
+			iwc = new IndexWriterConfig(new IKAnalyzer(false));
 			iwc.setSimilarity(new BM25Similarity());
     	}catch(IOException e){
     		e.printStackTrace();
@@ -47,17 +47,17 @@ public class WebIndex {
 					System.out.println("Count " + cnt);
 				String[] parts = line.split("\t");
 				File file = new File(path + parts[1]);
-				Document document = FileIndex.getDocument(file);
-				if(document == null){
+				Document doc = FileIndex.getDocument(file);
+				if(doc == null){
 					System.err.println(cnt + " " + parts[0] + " " + parts[1] + " " + parts[2]);
 					continue;
 				}
-				document.add(new StringField("url", parts[0], Field.Store.YES));
-				document.add(new StringField("name", file.getName(), Field.Store.YES));
-				document.add(new StringField("path", file.getAbsolutePath(), Field.Store.YES));
-				document.add(new FloatDocValuesField("pagerank", Float.parseFloat(parts[2])));
-				document.add(new NumericDocValuesField("click", 0));
-				indexWriter.addDocument(document);
+				doc.add(new StringField("url", parts[0], Field.Store.YES));
+				doc.add(new StringField("name", file.getName(), Field.Store.YES));
+				doc.add(new StringField("path", file.getAbsolutePath(), Field.Store.YES));
+				doc.add(new FloatDocValuesField("pagerank", Float.parseFloat(parts[2])));
+				doc.add(new NumericDocValuesField("click", 0));
+				indexWriter.addDocument(doc);
 			}
 			reader.close();
 			indexWriter.close();
@@ -67,7 +67,7 @@ public class WebIndex {
 	}
 	
 	public static void main(String[] args){
-		WebIndex index = new WebIndex("index");
+		WebIndex index = new WebIndex();
 		index.buildIndex("D:/workspace/mirror__3/");
 	}
 }

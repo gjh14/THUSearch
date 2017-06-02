@@ -40,10 +40,11 @@ System.out.println(basePath);
 <div id="Layer1" style="top: 210px; left: 353px; width: 441px;">
 	<form id="form1" name="form1" method="get" action="servlet/THUServer">
 		<label>
-			<input name="query" type="text" size="50" />
+			<input name="query" type="text" size="50"/>
 		</label>
 		<label>
-			<input type="submit" name="submit" value="Search" />
+			<input type="submit" name="submit" value="搜索"/>
+			<input name ="tag" value="search" style="display:none"/>
 		</label>
 	</form>
 </div>
