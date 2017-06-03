@@ -150,9 +150,9 @@ public class WebSearch {
 			manager.maybeRefresh();
 			List<LeafReaderContext> contexts = manager.acquire().getIndexReader().leaves();
 			int index = ReaderUtil.subIndex(docid, contexts);
-			LeafReader reader = contexts.get(index).reader();
-			NumericDocValues values = DocValues.getNumeric(reader, "click");
-			long click = values.get(docid) + 1;
+			LeafReaderContext context = contexts.get(index);
+			NumericDocValues values = DocValues.getNumeric(context.reader(), "click");
+			long click = values.get(docid - context.docBase) + 1;
 			writer.updateNumericDocValue(new Term("url", doc.get("url")), "click", click);
 			System.out.println("Click " + click + " Term " + new Term("url", doc.get("url")));
 		} catch (IOException e) {
