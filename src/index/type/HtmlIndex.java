@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
@@ -19,9 +20,20 @@ public class HtmlIndex {
 			if(title != null)
 				doc.add(new TextField("title", title, Field.Store.NO));
 			if(htmlDoc.body() != null){
-				String body = htmlDoc.body().text();
-				if(body != null)
-					doc.add(new TextField("body", body, Field.Store.NO));
+				Element body = htmlDoc.body();				
+				body.select("header").remove();
+				body.select("footer").remove();
+				String text = body.text();
+				doc.add(new TextField("body", text, Field.Store.NO));
+				
+				Elements imgs = body.getElementsByTag("img");
+				for(Element img : imgs){
+					String src = img.attr("src");
+					if(!src.equals("")){
+						doc.add(new StringField("img", src, Field.Store.YES));
+						break;
+					}
+				}
 			}
 			String keywords = "";
 			Elements metas = htmlDoc.getElementsByTag("meta");
@@ -41,8 +53,8 @@ public class HtmlIndex {
 	
 	public static void main(String[] args){
 		String path = "D:/workspace/mirror__4/news.tsinghua.edu.cn/publish"
-				+ "/thunews/9648/2011/20110225225331640818874/20110225225331640818874_.html";
+				+ "/thunewsen/9707/index.html";
 		Document doc = HtmlIndex.getDocument(new File(path));
-		System.out.println(doc.get("keywords"));
+		System.out.println(doc.get("body") + "\n" + doc.get("img"));
 	}
 }

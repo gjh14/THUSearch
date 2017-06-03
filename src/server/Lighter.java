@@ -28,8 +28,7 @@ public class Lighter {
 	
 	public Lighter(String queryString, Document doc, boolean flag){
 		analyzer = new IKAnalyzer(flag);
-		SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter(  
-				"<font color=\"#FF0000\">", "</font>");
+		SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter("<em>", "</em>");
 		try {
 			Query query = new QueryParser("", analyzer).parse(queryString); 
 			QueryScorer scorer = new QueryScorer(query);
