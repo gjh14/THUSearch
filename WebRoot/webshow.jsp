@@ -121,7 +121,7 @@
 		<a href="<%= server %>&page=<%= currentPage - 1 %>" class="np">上一页</a>
 <%
 	}
-	for(int i = Math.max(1, currentPage - 5); i < currentPage; ++i){
+	for(int i = Math.max(1, currentPage - 4); i < currentPage; ++i){
 %>
 		<a href="<%= server %>&page=<%= i %>"><%= i %></a>
 <%
@@ -129,7 +129,7 @@
 %>
 		<span><%= currentPage %></span>
 <%
-	for(int i = currentPage + 1; i <= Math.min(maxPage, currentPage + 5); ++i){
+	for(int i = currentPage + 1; i <= Math.min(maxPage, currentPage + 4); ++i){
 %>
 		<a href="<%= server %>&page=<%= i %>"><%= i %></a>
 <%

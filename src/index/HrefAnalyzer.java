@@ -374,7 +374,7 @@ public class HrefAnalyzer {
 	}
 	
 	public static void main(String[] args) {
-		String path = "D:/workspace/mirror__4/";
+		String path = WebIndex.MIRRORDIR;
 		String web = "news.tsinghua.edu.cn";
 		HrefAnalyzer analyzer = new HrefAnalyzer("news.tsinghua.edu.cn");
 		analyzer.search(new File(path + web), web);

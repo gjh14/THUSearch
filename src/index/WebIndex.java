@@ -21,8 +21,8 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 import index.type.FileIndex;
 
 public class WebIndex {
-	static public String MIRRORDIR = "D:/workspace/mirror__4";
-	static public String INDEXDIR = MIRRORDIR + "/index";
+	final static public String MIRRORDIR = "D:/workspace/.metadata/.me_tcat85/webapps/";
+	final static public String INDEXDIR = MIRRORDIR + "index";
 	 
     private Directory dir;
     private IndexWriterConfig iwc;

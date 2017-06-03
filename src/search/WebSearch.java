@@ -35,11 +35,11 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 import index.WebIndex;
 
 public class WebSearch {
-	private static String[] field = new String[]{"title", "body", "text", "archor", "keywords"};
+	private static String[] field = new String[]{"entry", "body", "text", "archor", "keywords"};
 	static private Map<String, Float> boosts;
 	static{
 		boosts = new HashMap<String, Float>();
-		boosts.put("title", 10.0f);
+		boosts.put("entry", 60.0f);
 		boosts.put("body", 1.0f);
 		boosts.put("text", 1.0f);
 		boosts.put("archor", 40.0f);
@@ -74,6 +74,7 @@ public class WebSearch {
 			tot = searcher.getIndexReader().maxDoc();
 			LeafReader reader = manager.acquire().getIndexReader().leaves().get(0).reader();
 			NumericDocValues values = DocValues.getNumeric(reader, "click");
+			//sum = 50;
 			for(int i = 0; i < tot; ++i)
 				sum += values.get(i);
 			
@@ -107,7 +108,7 @@ public class WebSearch {
 			
 			manager.maybeRefresh();
 			searcher = manager.acquire();
-			return searcher.search(query, 100);
+			return searcher.search(query, 200);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

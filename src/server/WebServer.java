@@ -2,6 +2,7 @@ package server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -54,7 +55,24 @@ public class WebServer extends HttpServlet {
 		String[] vis = null;
 		
 		if (results != null && results.scoreDocs.length > 0) {
-			ScoreDoc[] hits = results.scoreDocs;
+			ArrayList<ScoreDoc> candi = new ArrayList<ScoreDoc>();
+			ArrayList<String> candiEr = new ArrayList<String>();
+			for (ScoreDoc it : results.scoreDocs) {
+				String er = search.getDoc(it.doc).get("entry");
+				boolean unique = true;
+				for (String str : candiEr)
+					if (str.equals(er)) {
+						unique = false;
+						break;
+					}
+				if (unique) {
+					candi.add(it);
+					candiEr.add(er);
+				}
+			}
+			
+			ScoreDoc[] hits = (ScoreDoc[]) candi.toArray(new ScoreDoc[candi.size()]);
+			//ScoreDoc[] hits = results.scoreDocs;
 			maxpage = (hits.length - 1) / 10 + 1;
 			int len = Math.min(10, hits.length - (page - 1) * 10);
 			
@@ -75,8 +93,9 @@ public class WebServer extends HttpServlet {
 				docs[i] = hit.doc;
 				entrys[i] = lighter.getEntry();
 				absts[i] = lighter.getAbst();
-				urls[i] = Lighter.cut(url, 32);
-				paths[i] = doc.get("path");
+				urls[i] = Lighter.cut(url, 40);
+				//paths[i] = doc.get("path");
+				paths[i] = "/" + url;
 				imgs[i] = "http://" + url.substring(0, url.indexOf('/')) + doc.get("img");
 				vis[i] = reader.get(url);
 				System.out.println("doc=" + hit.doc + " score=" + hit.score + " url=" + urls[i]);

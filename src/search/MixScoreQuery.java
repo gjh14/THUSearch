@@ -10,8 +10,8 @@ import org.apache.lucene.search.Query;
 
 public class MixScoreQuery extends CustomScoreQuery{
 	static double cyc = 500;
-	static double ratio = 1000;
-	static double exp = 0.5;
+	static double ratio = 10000;
+	static double exp = 0.25;
 	
 	int tot, sum;
 	
