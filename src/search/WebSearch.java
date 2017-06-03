@@ -49,7 +49,7 @@ public class WebSearch {
 	private ControlledRealTimeReopenThread<IndexSearcher> crt = null;
 	private IndexSearcher searcher = null;
 	
-	static long period = 10000;
+	static long period = 60000;
 	private int tot, sum;
 	private Timer timer = null;
 			

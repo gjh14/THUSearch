@@ -70,10 +70,16 @@ public class Lighter {
 	    return result; 
 	}
 	
+	static public String cut(String str, int limit){
+		int len = str.getBytes().length;
+		return len < limit ? str : str.substring(0, limit) + "...";
+	}
+	
 	public String getEntry(){
 		TokenStream tokenStream = analyzer.tokenStream("", entry);
 		try {
-			return highlighter.getBestFragment(tokenStream, entry);
+			String css = highlighter.getBestFragment(tokenStream, entry);
+			return css == null ? entry : css;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -84,10 +90,7 @@ public class Lighter {
 		TokenStream tokenStream = analyzer.tokenStream("", abst);
 		try {
 			String css = highlighter.getBestFragment(tokenStream, abst);
-			String end = abst.length() > MAXLEN ? "..." : "";
-			if(css == null)
-				css = abst.length() > MAXLEN ? abst.substring(0, MAXLEN) : abst;
-			return css + end;
+			return (css == null ? cut(abst, MAXLEN) : css) + (abst.length() > MAXLEN ? "..." : "");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

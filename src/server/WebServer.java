@@ -31,55 +31,64 @@ public class WebServer extends HttpServlet {
 	public void doSearch(HttpServletRequest request, HttpServletResponse response, boolean flag)
 			throws ServletException, IOException{
 		String queryString = request.getParameter("query");
+		System.out.println(queryString);
+		if(queryString == null || queryString.length() == 0){
+			response.sendRedirect("../websearch.jsp");
+			return;
+		}
+		
 		String pageString = request.getParameter("page");
-
-		int page = pageString != null ? Integer.parseInt(pageString) : 1;
 		int maxpage = 0;
-		if (queryString == null)
-			System.out.println("null query");
-		else {
-			System.out.println(queryString);
-			TopDocs results = search.searchQuery(queryString, flag);
-			int[] docs = null;
-			String[] urls = null;
-			String[] entrys = null;
-			String[] absts = null;
-			String[] paths = null;
-			if (results != null && results.scoreDocs.length > 0) {
-				ScoreDoc[] hits = results.scoreDocs;
-				maxpage = (hits.length - 1) / 10 + 1;
-				int len = Math.min(10, hits.length - (page - 1) * 10);
-				docs = new int[len];
-				urls = new String[len];
-				entrys = new String[len];
-				absts = new String[len];
-				paths = new String[len];
-				for (int i = 0; i < len; ++i) {
-					ScoreDoc hit = hits[10 * (page - 1) + i];
-					Document doc = search.getDoc(hit.doc); 
-					Lighter lighter = new Lighter(queryString, doc, flag);
-					docs[i] = hit.doc;
-					entrys[i] = lighter.getEntry();
-					absts[i] = lighter.getAbst();
-					urls[i] = doc.get("url");
-					paths[i] = doc.get("path");
-					System.out.println("doc=" + hit.doc + " score=" + hit.score + " url=" + urls[i]);
-				}
-			} else {
-				System.out.println("result null");
+		int page = pageString != null ? Integer.parseInt(pageString) : 1;
+		TopDocs results = search.searchQuery(queryString, flag);
+		
+		int[] docs = null;
+		String[] urls = null;
+		String[] entrys = null;
+		String[] absts = null;
+		String[] paths = null;
+		String[] imgs = null;
+		
+		if (results != null && results.scoreDocs.length > 0) {
+			ScoreDoc[] hits = results.scoreDocs;
+			maxpage = (hits.length - 1) / 10 + 1;
+			int len = Math.min(10, hits.length - (page - 1) * 10);
+			
+			docs = new int[len];
+			urls = new String[len];
+			entrys = new String[len];
+			absts = new String[len];
+			paths = new String[len];
+			imgs = new String[len];
+			
+			for (int i = 0; i < len; ++i) {
+				ScoreDoc hit = hits[10 * (page - 1) + i];
+				Document doc = search.getDoc(hit.doc); 
+				Lighter lighter = new Lighter(queryString, doc, flag);
+				
+				docs[i] = hit.doc;
+				entrys[i] = lighter.getEntry();
+				absts[i] = lighter.getAbst();
+				urls[i] = Lighter.cut(doc.get("url"), 32);
+				paths[i] = doc.get("path");
+				imgs[i] = doc.get("img");
+				System.out.println("doc=" + hit.doc + " score=" + hit.score + " url=" + urls[i]);
 			}
+		} else {
+			System.out.println("result null");
+		}
 
-			request.setAttribute("currentTag", flag ? "search" : "more");
-			request.setAttribute("currentQuery", queryString);
-			request.setAttribute("maxPage", maxpage);
-			request.setAttribute("currentPage", page);
-			request.setAttribute("webDocs", docs);
-			request.setAttribute("webUrls", urls);
-			request.setAttribute("webEntrys", entrys);
-			request.setAttribute("webAbsts", absts);
-			request.setAttribute("webPaths", paths);
-			request.getRequestDispatcher("/webshow.jsp").forward(request, response);
-		}		
+		request.setAttribute("currentTag", "search");
+		request.setAttribute("currentQuery", queryString);
+		request.setAttribute("maxPage", maxpage);
+		request.setAttribute("currentPage", page);
+		request.setAttribute("webDocs", docs);
+		request.setAttribute("webUrls", urls);
+		request.setAttribute("webEntrys", entrys);
+		request.setAttribute("webAbsts", absts);
+		request.setAttribute("webPaths", paths);
+		request.setAttribute("webImgs", imgs);
+		request.getRequestDispatcher("/webshow.jsp").forward(request, response);		
 	}
 	
 	public void doLink(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
@@ -98,14 +107,13 @@ public class WebServer extends HttpServlet {
 		if(tag != null)
 			switch(tag){
 				case "search":
-				case "more":
 					doSearch(request, response, false);
 					break;
 				case "link":
 					doLink(request, response);
 					break;
 				default:
-				}
+			}
 	}
 
 	@Override
