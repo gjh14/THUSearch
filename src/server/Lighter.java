@@ -17,9 +17,9 @@ import org.apache.lucene.search.highlight.SimpleSpanFragmenter;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 public class Lighter {
-	private int MAXLEN = 100;
+	final private int MAXLEN = 100;
+	private static Analyzer analyzer = new IKAnalyzer(false);
 	
-	private Analyzer analyzer;
 	private Highlighter highlighter;
 	private String entry, abst;
 	private int len = 0;
@@ -27,7 +27,6 @@ public class Lighter {
 	public Lighter(String queryString, Document doc, boolean flag){
 		entry = doc.get("entry");
 		abst = doc.get("body") != null ? doc.get("body") : doc.get("text");
-		analyzer = new IKAnalyzer(flag);
 		SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter("<em>", "</em>");
 		try {
 			Query query = new QueryParser("", analyzer).parse(queryString); 

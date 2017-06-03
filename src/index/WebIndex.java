@@ -21,7 +21,8 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 import index.type.FileIndex;
 
 public class WebIndex {
-	static public String INDEXDIR = "D:/workspace/mirror__4/index";
+	static public String MIRRORDIR = "D:/workspace/mirror__4";
+	static public String INDEXDIR = MIRRORDIR + "/index";
 	 
     private Directory dir;
     private IndexWriterConfig iwc;
@@ -38,32 +39,35 @@ public class WebIndex {
 
 	public void makeEntry(Document doc, String[] parts){
 		String archor = "";
-		String entry = doc.get("title") != null ? doc.get("title") : "";
+		String entry = "";
 		for(int i = 2; i < parts.length; ++i){
 			archor += parts[i] + " ";
 			if(parts[i].length() < 64 && parts[i].length() > entry.length())
 				entry = parts[i];
 		}
+		String title = doc.get("title");
+		if(title != null && title.length() > 4)
+			entry = title;
 		if(entry.equals(""))
 			entry = parts[0];
 		doc.add(new TextField("archor", archor, Field.Store.NO));
 		doc.add(new TextField("entry", entry, Field.Store.YES));
 	}
 	
-	public void buildIndex(String path){
+	public void buildIndex(){
 		int cnt = 0;
 		try{
 			IndexWriter indexWriter = new IndexWriter(dir,iwc);
 			indexWriter.deleteAll();
 			BufferedReader reader = new BufferedReader(new FileReader(
-					new File(path + "allinfo.txt")));
+					new File(MIRRORDIR + "allinfo.txt")));
 			for(String line; (line = reader.readLine()) != null;){
 				if(cnt++ < indexWriter.maxDoc())
 					continue;
 				if(cnt % 1000 == 0)
 					System.out.println("Count " + cnt);
 				String[] parts = line.split("\t");
-				File file = new File(path + parts[0]);
+				File file = new File(MIRRORDIR + parts[0]);
 				Document doc = FileIndex.getDocument(file);
 				if(doc == null){
 					System.err.println(cnt + " " + parts[0] + " " + parts[1]);
@@ -86,6 +90,6 @@ public class WebIndex {
 	
 	public static void main(String[] args){
 		WebIndex index = new WebIndex();
-		index.buildIndex("D:/workspace/mirror__4/");
+		index.buildIndex();
 	}
 }

@@ -82,11 +82,9 @@ public class HrefAnalyzer {
 	
 	public void analyze(File file, String web) {
 		int webLabel = allocate(web);
-		//ArrayList<Integer> linkList = linkMap.get(webLabel);
 
 		try {
 			Document htmlDoc = null;
-//			System.out.println(Detector.fileCode(file));
 			htmlDoc = Jsoup.parse(file, "utf-8", "");
 			Elements links = htmlDoc.getElementsByTag("a");
 			for (Element link : links) {
@@ -237,27 +235,6 @@ public class HrefAnalyzer {
 				infoWriter.write("\n");
 			}
 			infoWriter.close();
-			
-			/*
-			FileWriter linkWriter = new FileWriter(path + "link.txt");
-			for (int i = 0; i < linkMap.size(); ++i) {
-				for (Integer j : linkMap.get(i))
-					linkWriter.write(i + "\t" + j + "\n");
-			}
-			linkWriter.close();
-			*/
-			
-			/*
-			FileWriter archorWriter = new FileWriter(path + "anchor.txt");
-			for (int i = 0; i < archorMap.size(); ++i)
-				if (archorMap.get(i).size() > 0) {
-					archorWriter.write(i + "");
-					for (String a : archorMap.get(i))
-						archorWriter.write("\t" + a);
-					archorWriter.write("\n");
-				}
-			archorWriter.close();
-			*/
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

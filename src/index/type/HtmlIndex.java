@@ -26,7 +26,8 @@ public class HtmlIndex {
 				Element body = htmlDoc.body();				
 				body.select("header").remove();
 				body.select("footer").remove();
-				String text = body.text();
+				body.select("[style*=display:none]").remove();
+				String text = FileIndex.link(body.text());
 				doc.add(new TextField("body", text, Field.Store.YES));
 				
 				Elements imgs = body.getElementsByTag("img");
@@ -56,7 +57,7 @@ public class HtmlIndex {
 	
 	public static void main(String[] args){
 		String path = "D:/workspace/mirror__4/news.tsinghua.edu.cn/publish"
-				+ "/thunewsen/9707/index.html";
+				+ "/thunewsen/9707/清华大学新闻网 - 清华史苑.html";
 		Document doc = HtmlIndex.getDocument(new File(path));
 		System.out.println(doc.get("body") + "\n" + doc.get("img"));
 	}
