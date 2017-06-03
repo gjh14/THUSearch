@@ -303,76 +303,97 @@ public class HrefAnalyzer {
         }
 	}
 	
-	public void verticalIndexCalc() {
-		System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
-		int count = 0;
-		
-		for (int i = 0; i < mapLabel; ++i)
-			if (pagerank[i] > parentPageRankValue && webList.get(i).contains("index")) {
-				ArrayList<LogRecord> log = new ArrayList<LogRecord>();
-				String prei = webList.get(i).substring(0, webList.get(i).lastIndexOf('/'));
-				for (int j = 0; j < linkMap.get(i).size(); ++j) {
-					int it = linkMap.get(i).get(j).intValue();
-					// self unique select
-					if (it == i) continue;
-					// page rank select
-					if (pagerank[it] < sonPageRankValue || pagerank[it] > pagerank[i]) continue;
-					// text length select
-					String text = linkStr.get(i).get(j).replaceAll(" ", "");
-					if (text.length() < 4 || text.length() > 64) continue;
-					// unique select
-					boolean unique = true;
-					for (int k = 0; k < log.size(); ++k)
-						if (log.get(k).id == it) {
-							unique = false;
-							break;
+	public void verticalIndexCalc(String path) {
+		FileWriter viWriter = null;
+		try {
+			viWriter = new FileWriter(path + "vi.txt", false);
+			
+			System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+			int count = 0;
+			
+			for (int i = 0; i < mapLabel; ++i)
+				if (pagerank[i] > parentPageRankValue && webList.get(i).contains("index")) {
+					ArrayList<LogRecord> log = new ArrayList<LogRecord>();
+					String prei = webList.get(i).substring(0, webList.get(i).lastIndexOf('/'));
+					for (int j = 0; j < linkMap.get(i).size(); ++j) {
+						int it = linkMap.get(i).get(j).intValue();
+						// self unique select
+						if (it == i) continue;
+						// page rank select
+						if (pagerank[it] < sonPageRankValue || pagerank[it] > pagerank[i]) continue;
+						// text length select
+						String text = linkStr.get(i).get(j).replaceAll(" ", "");
+						if (text.length() < 4 || text.length() > 64) continue;
+						// unique select
+						boolean unique = true;
+						for (int k = 0; k < log.size(); ++k)
+							if (log.get(k).id == it) {
+								unique = false;
+								break;
+							}
+						if (!unique) continue;
+						// ENGLISH select
+						if (text.equals("ENGLISH")) continue;
+						if (text.equals("HOME")) continue;
+						// prefix test
+						String prej = webList.get(it).substring(0, webList.get(it).lastIndexOf('/'));
+						if (prej.equals(prei)) continue;
+						if (!prej.startsWith(prei)) continue;
+						// show text calc
+						String showText = linkStr.get(i).get(j);
+						int byteLen = showText.getBytes().length;
+						if (byteLen > 64) {
+							int realLen = showText.length();
+							int subLen = realLen * 1.5 < byteLen ? 32 - 3 : 64 - 3;
+							showText = showText.substring(0, subLen) + "...";
+							byteLen = subLen + 3;
 						}
-					if (!unique) continue;
-					// ENGLISH select
-					if (text.equals("ENGLISH")) continue;
-					if (text.equals("HOME")) continue;
-					// prefix test
-					String prej = webList.get(it).substring(0, webList.get(it).lastIndexOf('/'));
-					if (prej.equals(prei)) continue;
-					if (!prej.startsWith(prei)) continue;
-					// show text calc
-					String showText = linkStr.get(i).get(j);
-					int byteLen = showText.getBytes().length;
-					if (byteLen > 64) {
-						int realLen = showText.length();
-						int subLen = realLen * 1.5 < byteLen ? 32 - 3 : 64 - 3;
-						showText = showText.substring(0, subLen) + "...";
-						byteLen = subLen + 3;
+						// pass all test
+						log.add(new LogRecord(it, pagerank[it], showText, byteLen));
 					}
-					// pass all test
-					log.add(new LogRecord(it, pagerank[it], showText, byteLen));
+					
+			        Collections.sort(log, new Comparator<LogRecord>() {
+						@Override
+			            public int compare(LogRecord b1, LogRecord b2) {  
+			                //return b2.score - b1.score > 1e-7? 1 : -1;
+			            	if (b2.pr - b1.pr > 1e-7) return 1;
+			            	else if (b1.pr - b2.pr > 1e-7) return -1;
+			            	else return 0;
+			            }
+			        }); 
+			        
+			        int num = Math.min(log.size(), 10);
+			        if (num > 0) {
+			        	System.out.println("\n");
+			        	System.out.println(pagerank[i] + " " + webList.get(i));
+			        	String vioutput = webList.get(i);
+			        	
+			        	int lenCount = 0;
+			        	for (int j = 0; j < num; ++j) {
+			        		if (lenCount + log.get(j).len > 110) break;
+			        		lenCount += log.get(j).len;
+			        		System.out.println(log.get(j).text + " " + pagerank[log.get(j).id] + " " + webList.get(log.get(j).id));
+			        		vioutput = vioutput + "\t" + log.get(j).text + "\t" + webList.get(log.get(j).id);
+			        	}
+			        	System.out.println("sum len = " + lenCount);
+			        	++count;
+			        	viWriter.write(vioutput + "\n");
+			        }
 				}
-				
-		        Collections.sort(log, new Comparator<LogRecord>() {
-					@Override
-		            public int compare(LogRecord b1, LogRecord b2) {  
-		                //return b2.score - b1.score > 1e-7? 1 : -1;
-		            	if (b2.pr - b1.pr > 1e-7) return 1;
-		            	else if (b1.pr - b2.pr > 1e-7) return -1;
-		            	else return 0;
-		            }
-		        }); 
-		        
-		        int num = Math.min(log.size(), 10);
-		        if (num > 0) {
-		        	System.out.println("\n");
-		        	System.out.println(pagerank[i] + " " + webList.get(i));
-		        	int lenCount = 0;
-		        	for (int j = 0; j < num; ++j) {
-		        		if (lenCount + log.get(j).len > 110) break;
-		        		lenCount += log.get(j).len;
-		        		System.out.println(log.get(j).text + " " + pagerank[log.get(j).id] + " " + webList.get(log.get(j).id));
-		        	}
-		        	System.out.println("sum len = " + lenCount);
-		        	++count;
-		        }
-			}
-		System.out.println("vi count = " + count);
+			System.out.println("vi count = " + count);
+			viWriter.close();
+			viWriter = null;
+		} catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (viWriter != null) {
+                try {
+                	viWriter.close();
+                } catch (IOException e1) {
+                	e1.printStackTrace();
+                }
+            }
+        }
 	}
 	
 	public static void main(String[] args) {
@@ -382,6 +403,6 @@ public class HrefAnalyzer {
 		analyzer.search(new File(path + web), web);
 		analyzer.pageRankCalc();
 		analyzer.output(path);
-		analyzer.verticalIndexCalc();
+		analyzer.verticalIndexCalc(path);
 	}
 }
