@@ -17,7 +17,7 @@ public class DocIndex {
 			String text = doc.getDocumentText();
 			if(text != null){
 				String linked = FileIndex.link(text);
-				document.add(new TextField("text", linked, Field.Store.NO));
+				document.add(new TextField("text", linked, Field.Store.YES));
 			}
 			doc.close();
 			return document;

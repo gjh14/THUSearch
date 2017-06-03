@@ -19,7 +19,7 @@ public class DocxIndex {
 			String text = extractor.getText();
 			if(text != null){
 				String linked = FileIndex.link(text);
-				document.add(new TextField("text", linked, Field.Store.NO));
+				document.add(new TextField("text", linked, Field.Store.YES));
 			}
 			extractor.close();
 			return document;

@@ -27,7 +27,7 @@ public class HtmlIndex {
 				body.select("header").remove();
 				body.select("footer").remove();
 				String text = body.text();
-				doc.add(new TextField("body", text, Field.Store.NO));
+				doc.add(new TextField("body", text, Field.Store.YES));
 				
 				Elements imgs = body.getElementsByTag("img");
 				for(Element img : imgs){
