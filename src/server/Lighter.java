@@ -73,12 +73,7 @@ public class Lighter {
 	public String getEntry(){
 		TokenStream tokenStream = analyzer.tokenStream("", entry);
 		try {
-			String css = highlighter.getBestFragment(tokenStream, entry);
-//			System.out.println(entry + ": " + css);
-			String end = entry.length() > MAXLEN ? "..." : "";
-			if(css == null)
-				css = entry.length() > MAXLEN ? entry.substring(0, MAXLEN) : entry;
-			return css + end;
+			return highlighter.getBestFragment(tokenStream, entry);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -89,7 +84,6 @@ public class Lighter {
 		TokenStream tokenStream = analyzer.tokenStream("", abst);
 		try {
 			String css = highlighter.getBestFragment(tokenStream, abst);
-//			System.out.println(abst + ": " + css);
 			String end = abst.length() > MAXLEN ? "..." : "";
 			if(css == null)
 				css = abst.length() > MAXLEN ? abst.substring(0, MAXLEN) : abst;
@@ -101,7 +95,7 @@ public class Lighter {
 	}
 	
 	static public void main(String[] args){
-		for(String x : Lighter.getWords("大学新闻", true))
+		for(String x : Lighter.getWords("大学新闻", false))
 			System.out.println(x);
 	}
 }
