@@ -24,6 +24,7 @@ import org.apache.lucene.search.ReferenceManager;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SearcherFactory;
 import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.Directory;
@@ -92,7 +93,7 @@ public class WebSearch {
 	}
 	
 	public TopDocs searchQuery(String queryString, boolean flag){
-		System.out.println("query=" + queryString);
+		System.out.println("Query = " + queryString);
 		MultiFieldQueryParser parser = new MultiFieldQueryParser(field, new IKAnalyzer(flag), boosts);
 		try {
 			Query normalQuery = parser.parse(queryString);
@@ -105,6 +106,17 @@ public class WebSearch {
 			searcher = manager.acquire();
 			return searcher.search(query, 100);
 		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public TopDocs searchEntry(String input, boolean flag){
+		System.out.println("Input = " + input);
+		Query query = new TermQuery(new Term("entry", input));
+		try {
+			return searcher.search(query, 5);
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;

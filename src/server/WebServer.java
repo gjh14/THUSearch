@@ -69,13 +69,14 @@ public class WebServer extends HttpServlet {
 				Document doc = search.getDoc(hit.doc); 
 				Lighter lighter = new Lighter(queryString, doc, flag);
 				
+				String url = doc.get("url");
 				docs[i] = hit.doc;
 				entrys[i] = lighter.getEntry();
 				absts[i] = lighter.getAbst();
-				urls[i] = Lighter.cut(doc.get("url"), 32);
+				urls[i] = Lighter.cut(url, 32);
 				paths[i] = doc.get("path");
-				imgs[i] = doc.get("img");
-				vis[i] = reader.get(doc.get("url"));
+				imgs[i] = "http://" + url.substring(0, url.indexOf('/')) + doc.get("img");
+				vis[i] = reader.get(url);
 				System.out.println("doc=" + hit.doc + " score=" + hit.score + " url=" + urls[i]);
 			}
 		} else {
