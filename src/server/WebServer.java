@@ -1,8 +1,6 @@
 package server;
 
 import java.io.IOException;
-import java.util.Enumeration;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -12,14 +10,17 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 
+import index.ViReader;
 import search.WebSearch;
 
 public class WebServer extends HttpServlet {
 	private WebSearch search;
+	private ViReader reader;
 
 	public WebServer() {
 		super();
 		search = new WebSearch();
+		reader = new ViReader("D:/workspace/mirror__4/vi.txt");
 	}
 
 	@Override
@@ -48,6 +49,7 @@ public class WebServer extends HttpServlet {
 		String[] absts = null;
 		String[] paths = null;
 		String[] imgs = null;
+		String[] vis = null;
 		
 		if (results != null && results.scoreDocs.length > 0) {
 			ScoreDoc[] hits = results.scoreDocs;
@@ -60,18 +62,21 @@ public class WebServer extends HttpServlet {
 			absts = new String[len];
 			paths = new String[len];
 			imgs = new String[len];
+			vis = new String[len];
 			
 			for (int i = 0; i < len; ++i) {
 				ScoreDoc hit = hits[10 * (page - 1) + i];
 				Document doc = search.getDoc(hit.doc); 
 				Lighter lighter = new Lighter(queryString, doc, flag);
 				
+				String url = doc.get("url");
 				docs[i] = hit.doc;
 				entrys[i] = lighter.getEntry();
 				absts[i] = lighter.getAbst();
-				urls[i] = Lighter.cut(doc.get("url"), 32);
+				urls[i] = Lighter.cut(url, 32);
 				paths[i] = doc.get("path");
-				imgs[i] = doc.get("img");
+				imgs[i] = "http://" + url.substring(0, url.indexOf('/')) + doc.get("img");
+				vis[i] = reader.get(url);
 				System.out.println("doc=" + hit.doc + " score=" + hit.score + " url=" + urls[i]);
 			}
 		} else {
@@ -88,6 +93,7 @@ public class WebServer extends HttpServlet {
 		request.setAttribute("webAbsts", absts);
 		request.setAttribute("webPaths", paths);
 		request.setAttribute("webImgs", imgs);
+		request.setAttribute("webVis", vis);
 		request.getRequestDispatcher("/webshow.jsp").forward(request, response);		
 	}
 	

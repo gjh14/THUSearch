@@ -8,8 +8,6 @@ import org.apache.lucene.document.TextField;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
-import index.Detector;
-
 
 public class DocxIndex {
 	public static Document getDocument(File file){
@@ -20,8 +18,8 @@ public class DocxIndex {
 			XWPFWordExtractor extractor = new XWPFWordExtractor(docx);
 			String text = extractor.getText();
 			if(text != null){
-				String trans = new String(text.getBytes(), Detector.textCode(text)).replaceAll("\\?", "");
-				document.add(new TextField("text", trans, Field.Store.NO));
+				String linked = FileIndex.link(text);
+				document.add(new TextField("text", linked, Field.Store.NO));
 			}
 			extractor.close();
 			return document;
@@ -32,7 +30,8 @@ public class DocxIndex {
 	}
 	
 	public static void main(String[] args){
-		File file = new File("mirror/docx/58eb20bc821f3.docx");
+		File file = new File("D:/workspace/mirror__4/news.tsinghua.edu.cn/"
+				+ "publish/thunewsen/9707/20160107/1475140069900.docx");
 		Document doc = getDocument(file);
 		System.out.println(doc.get("text"));
 	}
