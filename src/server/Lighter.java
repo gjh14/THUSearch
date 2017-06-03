@@ -1,6 +1,5 @@
 package server;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +16,6 @@ import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.SimpleSpanFragmenter;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
-import index.type.FileIndex;
-
 public class Lighter {
 	private int MAXLEN = 100;
 	
@@ -30,8 +27,6 @@ public class Lighter {
 	public Lighter(String queryString, Document doc, boolean flag){
 		entry = doc.get("entry");
 		abst = doc.get("body") != null ? doc.get("body") : doc.get("text");
-/*		Document con = FileIndex.getDocument(new File(doc.get("path")));
-		abst = con.get("body") != null ? con.get("body") : con.get("text");*/
 		analyzer = new IKAnalyzer(flag);
 		SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter("<em>", "</em>");
 		try {
