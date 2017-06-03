@@ -57,6 +57,7 @@ body { text-align:center; }
 .search .search_suggest li {
 	height: 30px;
 	overflow:hidden;
+	word-break: break-all;
 	padding-left:3px;
 	padding-right:5px;
 	line-height:30px;
