@@ -3,6 +3,7 @@ package search;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -10,10 +11,13 @@ import java.util.TimerTask;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DocValues;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.index.ReaderUtil;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queries.CustomScoreQuery;
 import org.apache.lucene.queries.function.FunctionQuery;
@@ -72,13 +76,15 @@ public class WebSearch {
 			manager.maybeRefresh();
 			searcher = manager.acquire();
 			tot = searcher.getIndexReader().maxDoc();
-			LeafReader reader = manager.acquire().getIndexReader().leaves().get(0).reader();
-			NumericDocValues values = DocValues.getNumeric(reader, "click");
-			System.out.println(tot + " " + reader.maxDoc() + " " + reader.numDocs());
-			//sum = 50;
-			for(int i = 0; i < tot; ++i)
-				sum += values.get(i);
 			
+			List<LeafReaderContext> contexts = manager.acquire().getIndexReader().leaves();
+			for(LeafReaderContext context : contexts){
+				LeafReader reader = context.reader();
+				NumericDocValues values = DocValues.getNumeric(reader, "click");
+				for(int i = 0; i < reader.maxDoc(); ++i)
+					sum += values.get(i);
+			}
+
 			timer = new Timer();
 			timer.scheduleAtFixedRate(new TimerTask(){
 				@Override
@@ -142,7 +148,9 @@ public class WebSearch {
 		Document doc = getDoc(docid);
 		try {
 			manager.maybeRefresh();
-			LeafReader reader = manager.acquire().getIndexReader().leaves().get(0).reader();
+			List<LeafReaderContext> contexts = manager.acquire().getIndexReader().leaves();
+			int index = ReaderUtil.subIndex(docid, contexts);
+			LeafReader reader = contexts.get(index).reader();
 			NumericDocValues values = DocValues.getNumeric(reader, "click");
 			long click = values.get(docid) + 1;
 			writer.updateNumericDocValue(new Term("url", doc.get("url")), "click", click);
