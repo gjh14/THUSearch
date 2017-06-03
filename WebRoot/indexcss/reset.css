@@ -1,0 +1,120 @@
+@charset "utf-8";
+/***************
+TsingStone Info&Art Design Studio
+the Academy of Arts & Design, Tsinghua University
+Author:Jason Woo 
+***************/
+html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,figcaption,code,del,dfn,em,image,q,dl,dt,dd,ol,ul,li,fieldset,form,legend,table,tf,tr,th {
+	border: 0px;
+	padding: 0px; 
+	font-size: 100%; 	
+	-webkit-text-size-adjust:none;
+	margin: 0px; 
+	font-family:"微软雅黑","黑体",microsoft yahei,sans-serif;
+}
+
+
+body {
+	color: #333;
+	line-height: 18px;
+	font-size: 12px;
+	font-family:"微软雅黑","黑体",microsoft yahei,sans-serif;
+	margin: 0px;
+}
+
+
+input,textarea,select
+{
+	font-family:"微软雅黑","黑体",microsoft yahei,sans-serif;
+	font-size:12px;
+	outline:none;
+	background:#fff;
+}
+
+img {
+	border: 0px;
+	vertical-align:bottom;
+}
+
+a, a:link {
+	text-decoration: none;
+	color:#82308e;
+}
+
+a:hover
+{
+	text-decoration:underline;
+	color:#82308e;
+}
+
+ul, li {
+	list-style-type:none;
+}
+.left {
+	float: left;
+}
+.right {
+	float: right;
+}
+
+.clearfix:after {
+	display:block;
+	content:' ';
+	clear:both;
+	height:0px;
+	visibility: hidden;
+}
+
+.yahei{
+	font-family:\5FAE\8F6F\96C5\9ED1,"Tahoma","Verdana","Arial","sans-serif";
+}
+
+.relative
+{
+	position:relative;
+}
+
+.clearfix {
+*display:inline-block;
+*zoom:1;
+}
+.clear
+{
+	clear:both;
+	overflow:hidden;
+	height:0;
+}
+
+
+.ie6
+{
+	text-align:center;
+	font-size:14px;
+	background:#fff7a3;
+	line-height:60px;
+}
+
+.ie6 span
+{
+	float:right;
+	margin-right:30px;
+	cursor:pointer;
+}
+
+
+*html{padding:0px} 
+/* Clear Fix */ 
+.clearfix:after { 
+content:”.”; 
+display:block; 
+height:0; 
+clear:both; 
+visibility:hidden; 
+} 
+.clearfix { 
+display:inline-block; 
+} 
+/* Hide from IE Mac */ 
+.clearfix {display:block;} 
+/* End hide from IE Mac */ 
+/* end of clearfix */ 

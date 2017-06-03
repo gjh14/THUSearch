@@ -22,6 +22,20 @@ class Record {
 	}
 }
 
+class LogRecord {
+	public int id;
+	public double pr;
+	public String text;
+	public int len;
+	
+	public LogRecord(int a, double b, String str, int l) {
+		id = a;
+		pr = b;
+		text = str;
+		len = l;
+	}
+}
+
 public class HrefAnalyzer {
 	final static String pageRankFileName = "pagerank.txt";
 	final static String pageRankReportName = "pagerank.log";
@@ -37,8 +51,14 @@ public class HrefAnalyzer {
 	HashMap<String, Integer> numMap = new HashMap<String, Integer>();
 	ArrayList<String> webList = new ArrayList<String>();
 	ArrayList<ArrayList<Integer>> linkMap = new ArrayList<ArrayList<Integer>>();
+	ArrayList<ArrayList<String>> linkStr = new ArrayList<ArrayList<String>>();
 	ArrayList<ArrayList<String>> archorMap = new ArrayList<ArrayList<String>>();
 	double[] pagerank = null;
+	
+	final static int parentPageRankDiv = 200;
+	final static int sonPageRankDiv = parentPageRankDiv / 2;
+	double parentPageRankValue = 0.001;
+	double sonPageRankValue = 0.0001;
 
 	public HrefAnalyzer(String web) {
 		root = web;
@@ -54,6 +74,7 @@ public class HrefAnalyzer {
 			webList.add(web);
 			assert(webList.size() == mapLabel);
 			linkMap.add(new ArrayList<Integer>());
+			linkStr.add(new ArrayList<String>());
 			archorMap.add(new ArrayList<String>());
 		}
 		return ret;
@@ -94,6 +115,7 @@ public class HrefAnalyzer {
 					
 					int linkLabel = allocate(wholePath);
 					linkMap.get(webLabel).add(linkLabel);
+					linkStr.get(webLabel).add(linkText);
 					archorMap.get(linkLabel).add(linkText);
 					//if (linkLabel == 52811)
 					//	System.err.println(linkLabel + " " + webLabel + " " + linkText + " " + linkHref + " " + wholePath);
@@ -255,6 +277,10 @@ public class HrefAnalyzer {
             }
         }); 
         
+        parentPageRankValue = log.get(log.size() / parentPageRankDiv).pr;
+        sonPageRankValue = log.get(log.size() / sonPageRankDiv).pr;
+        System.out.println("pagerank limit " + parentPageRankValue + " " + sonPageRankValue);
+        
         FileWriter logWriter = null;  
         try {
         	logWriter = new FileWriter(path + pageRankReportName, false);
@@ -276,7 +302,79 @@ public class HrefAnalyzer {
             }
         }
 	}
-
+	
+	public void verticalIndexCalc() {
+		System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+		int count = 0;
+		
+		for (int i = 0; i < mapLabel; ++i)
+			if (pagerank[i] > parentPageRankValue && webList.get(i).contains("index")) {
+				ArrayList<LogRecord> log = new ArrayList<LogRecord>();
+				String prei = webList.get(i).substring(0, webList.get(i).lastIndexOf('/'));
+				for (int j = 0; j < linkMap.get(i).size(); ++j) {
+					int it = linkMap.get(i).get(j).intValue();
+					// self unique select
+					if (it == i) continue;
+					// page rank select
+					if (pagerank[it] < sonPageRankValue || pagerank[it] > pagerank[i]) continue;
+					// text length select
+					String text = linkStr.get(i).get(j).replaceAll(" ", "");
+					if (text.length() < 4 || text.length() > 64) continue;
+					// unique select
+					boolean unique = true;
+					for (int k = 0; k < log.size(); ++k)
+						if (log.get(k).id == it) {
+							unique = false;
+							break;
+						}
+					if (!unique) continue;
+					// ENGLISH select
+					if (text.equals("ENGLISH")) continue;
+					if (text.equals("HOME")) continue;
+					// prefix test
+					String prej = webList.get(it).substring(0, webList.get(it).lastIndexOf('/'));
+					if (prej.equals(prei)) continue;
+					if (!prej.startsWith(prei)) continue;
+					// show text calc
+					String showText = linkStr.get(i).get(j);
+					int byteLen = showText.getBytes().length;
+					if (byteLen > 64) {
+						int realLen = showText.length();
+						int subLen = realLen * 1.5 < byteLen ? 32 - 3 : 64 - 3;
+						showText = showText.substring(0, subLen) + "...";
+						byteLen = subLen + 3;
+					}
+					// pass all test
+					log.add(new LogRecord(it, pagerank[it], showText, byteLen));
+				}
+				
+		        Collections.sort(log, new Comparator<LogRecord>() {
+					@Override
+		            public int compare(LogRecord b1, LogRecord b2) {  
+		                //return b2.score - b1.score > 1e-7? 1 : -1;
+		            	if (b2.pr - b1.pr > 1e-7) return 1;
+		            	else if (b1.pr - b2.pr > 1e-7) return -1;
+		            	else return 0;
+		            }
+		        }); 
+		        
+		        int num = Math.min(log.size(), 10);
+		        if (num > 0) {
+		        	System.out.println("\n");
+		        	System.out.println(pagerank[i] + " " + webList.get(i));
+		        	int lenCount = 0;
+		        	for (int j = 0; j < num; ++j) {
+		        		if (lenCount + log.get(j).len > 110) break;
+		        		lenCount += log.get(j).len;
+		        		System.out.println(log.get(j).text + " " + pagerank[log.get(j).id] + " " + webList.get(log.get(j).id));
+		        	}
+		        	System.out.println("sum len = " + lenCount);
+		        	++count;
+		        }
+			}
+		System.out.println("vi count = " + count);
+	}
+	
 	public static void main(String[] args) {
 		String path = "D:/workspace/mirror__4/";
 		String web = "news.tsinghua.edu.cn";
@@ -284,5 +382,6 @@ public class HrefAnalyzer {
 		analyzer.search(new File(path + web), web);
 		analyzer.pageRankCalc();
 		analyzer.output(path);
+		analyzer.verticalIndexCalc();
 	}
 }
