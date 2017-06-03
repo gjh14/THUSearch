@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.IndexWriter;
@@ -17,6 +18,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queries.CustomScoreQuery;
 import org.apache.lucene.queries.function.FunctionQuery;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.ControlledRealTimeReopenThread;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -48,6 +50,7 @@ public class WebSearch {
 	private IndexWriter writer = null;
 	private ReferenceManager<IndexSearcher> manager = null;
 	private ControlledRealTimeReopenThread<IndexSearcher> crt = null;
+	private Analyzer analyzer = null;
 	private IndexSearcher searcher = null;
 	
 	static long period = 60000;
@@ -66,6 +69,7 @@ public class WebSearch {
 			crt.setDaemon(true);
 			crt.start();
 			
+			analyzer = new IKAnalyzer(false);
 			manager.maybeRefresh();
 			searcher = manager.acquire();
 			tot = searcher.getIndexReader().maxDoc();
@@ -94,7 +98,7 @@ public class WebSearch {
 	
 	public TopDocs searchQuery(String queryString, boolean flag){
 		System.out.println("Query = " + queryString);
-		MultiFieldQueryParser parser = new MultiFieldQueryParser(field, new IKAnalyzer(flag), boosts);
+		MultiFieldQueryParser parser = new MultiFieldQueryParser(field, analyzer, boosts);
 		try {
 			Query normalQuery = parser.parse(queryString);
 			FunctionQuery pagerankQuery = new FunctionQuery(new PageRankValueScore());
@@ -113,10 +117,11 @@ public class WebSearch {
 	
 	public TopDocs searchEntry(String input, boolean flag){
 		System.out.println("Input = " + input);
-		Query query = new TermQuery(new Term("entry", input));
+		QueryParser parser = new QueryParser("entry", analyzer);
 		try {
+			Query query = parser.parse(input);
 			return searcher.search(query, 5);
-		} catch (IOException e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		return null;

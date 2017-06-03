@@ -25,23 +25,23 @@ public class Lighter {
 	private Analyzer analyzer;
 	private Highlighter highlighter;
 	private String entry, abst;
+	private int len = 0;
 	
 	public Lighter(String queryString, Document doc, boolean flag){
+		entry = doc.get("entry");
+		Document con = FileIndex.getDocument(new File(doc.get("path")));
+		abst = con.get("body") != null ? con.get("body") : con.get("text");
 		analyzer = new IKAnalyzer(flag);
 		SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter("<em>", "</em>");
 		try {
 			Query query = new QueryParser("", analyzer).parse(queryString); 
 			QueryScorer scorer = new QueryScorer(query);
 			highlighter = new Highlighter(htmlFormatter, scorer);
-			highlighter.setTextFragmenter(new SimpleSpanFragmenter(scorer, MAXLEN));
+			len = (int)(2.0 * MAXLEN * abst.length() / abst.getBytes().length);
+			highlighter.setTextFragmenter(new SimpleSpanFragmenter(scorer, len));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		entry = doc.get("entry");
-		Document con = FileIndex.getDocument(new File(doc.get("path")));
-		if(con != null)
-			abst = con.get("body") != null ? con.get("body") : con.get("text");
-//		System.out.println(entry + " " + abst);
 	}
 	
 	static public List<String> getWords(String text, boolean flag){
@@ -90,7 +90,7 @@ public class Lighter {
 		TokenStream tokenStream = analyzer.tokenStream("", abst);
 		try {
 			String css = highlighter.getBestFragment(tokenStream, abst);
-			return (css == null ? cut(abst, MAXLEN) : css) + (abst.length() > MAXLEN ? "..." : "");
+			return (css == null ? cut(abst, len) : css) + (abst.length() > len ? "..." : "");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
