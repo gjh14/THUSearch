@@ -74,6 +74,7 @@ public class WebSearch {
 			tot = searcher.getIndexReader().maxDoc();
 			LeafReader reader = manager.acquire().getIndexReader().leaves().get(0).reader();
 			NumericDocValues values = DocValues.getNumeric(reader, "click");
+			System.out.println(tot + " " + reader.maxDoc() + " " + reader.numDocs());
 			//sum = 50;
 			for(int i = 0; i < tot; ++i)
 				sum += values.get(i);

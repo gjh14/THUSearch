@@ -15,6 +15,7 @@ import org.apache.lucene.search.SearcherFactory;
 import org.apache.lucene.search.TopDocs;
 
 import index.ViReader;
+import index.WebIndex;
 import search.WebSearch;
 
 public class WebServer extends HttpServlet {
@@ -24,7 +25,7 @@ public class WebServer extends HttpServlet {
 	public WebServer() {
 		super();
 		search = new WebSearch();
-		reader = new ViReader("D:/workspace/mirror__4/vi.txt");
+		reader = new ViReader(WebIndex.MIRRORDIR + "vi.txt");
 	}
 
 	@Override
