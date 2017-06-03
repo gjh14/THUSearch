@@ -138,71 +138,27 @@ var searchSuggest =  new oSearchSuggest(sendKeyWordToBack);
 //这是一个模似函数，实现向后台发送ajax查询请求，并返回一个查询结果数据，传递给前台的JS,再由前台JS来展示数据。本函数由程序员进行修改实现查询的请求
 
 //参数为一个字符串，是搜索输入框中当前的内容
-
-function sendKeyWordToBack(keyword){
-	   /*  var obj = {
-
-			    "keyword" : keyword
-
-			 };
-
-			 $.ajax({
-
-					   type: "POST",
-
-					   url: "${ctx}/front/suqiu2/search/prompt-keyword.action",
-
-					   async:false,
-
-					   data: obj,
-
-					   dataType: "json",
-
-					   success: function(data){
-
-						 //var json = eval("("+data+")");
-
-						 var key=data.split(",");
-
-						 var aData = [];
-
-						 for(var i=0;i<key.length;i++){
-
-								//以下为根据输入返回搜索结果的模拟效果代码,实际数据由后台返回
-
-							if(key[i]!=""){
-
-								  aData.push(key[i]);
-
-							}
-
-						 }
-
-						//将返回的数据传递给实现搜索输入框的输入提示js类
-
-						 searchSuggest.dataDisplay(aData);
-
-					   }
-
-		 });	  */
-			 
-				//以下为根据输入返回搜索结果的模拟效果代码,实际数据由后台返回
-
-				var aData = [];
-				aData.push('返回数据1');
-				aData.push('返回数据2');
-				aData.push('不是有的人天生吃素的');
-				aData.push('不是有的人天生吃素的不是有的人天生吃素的不是有的人天生吃素的不是有的人天生吃素的');
-				aData.push('tsinghua tsinghua tsinghua tsinghua tsinghua');
-				aData.push('2012是假的');
-        aData.push('中国医促会');
-				//将返回的数据传递给实现搜索输入框的输入提示js类
-
-				searchSuggest.dataDisplay(aData);
 	
+function sendKeyWordToBack(keyword){
+	var req = new XMLHttpRequest();
+	var url = "http://localhost:8080/THUSearch/servlet/THUServer";
+	req.open("GET", url + "?tag=entry&query=" + keyword, true);  
+	req.onreadystatechange = function(event){
+			var key = req.responseText.split("\t");
+			var aData = [];
+			for(var i = 0; i < key.length; ++i)
+				if(key[i] != "")
+					aData.push(key[i]);
+			searchSuggest.dataDisplay(aData);
+		}  
+	req.setRequestHeader("Content-Type", "text/html;charset=UTF-8");
+	req.send(null);
+	
+/*	var aData = ["a", "b"];
+	searchSuggest.dataDisplay(aData);*/
 }
-</script>
 
+</script>
 
 </body>
 </html>

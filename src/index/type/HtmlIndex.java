@@ -17,8 +17,11 @@ public class HtmlIndex {
 			org.jsoup.nodes.Document htmlDoc;
 			htmlDoc = Jsoup.parse(file, "utf-8", "");
 			String title = htmlDoc.title();
-			if(title != null)
+			if(title != null){
+				title = title.replaceAll("\t", "").replaceAll("\n", "").replaceAll("\r", "");
 				doc.add(new TextField("title", title, Field.Store.NO));
+			}
+			
 			if(htmlDoc.body() != null){
 				Element body = htmlDoc.body();				
 				body.select("header").remove();

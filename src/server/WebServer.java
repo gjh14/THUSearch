@@ -1,6 +1,8 @@
 package server;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -8,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.SearcherFactory;
 import org.apache.lucene.search.TopDocs;
 
 import index.ViReader;
@@ -32,7 +35,6 @@ public class WebServer extends HttpServlet {
 	public void doSearch(HttpServletRequest request, HttpServletResponse response, boolean flag)
 			throws ServletException, IOException{
 		String queryString = request.getParameter("query");
-		System.out.println(queryString);
 		if(queryString == null || queryString.length() == 0){
 			response.sendRedirect("../websearch.jsp");
 			return;
@@ -41,8 +43,8 @@ public class WebServer extends HttpServlet {
 		String pageString = request.getParameter("page");
 		int maxpage = 0;
 		int page = pageString != null ? Integer.parseInt(pageString) : 1;
-		TopDocs results = search.searchQuery(queryString, flag);
 		
+		TopDocs results = search.searchQuery(queryString, flag);
 		int[] docs = null;
 		String[] urls = null;
 		String[] entrys = null;
@@ -105,6 +107,25 @@ public class WebServer extends HttpServlet {
 		response.sendRedirect(url);
 	}
 	
+	public void doEntry(HttpServletRequest request, HttpServletResponse response) throws IOException{
+		String query = request.getParameter("query");
+		if(query != null){
+			TopDocs results = search.searchEntry(query, false);
+			String list = "";
+			if(results != null && results.scoreDocs.length > 0){
+				for(ScoreDoc doc : results.scoreDocs){
+					String entry = search.getDoc(doc.doc).get("entry");
+					list += (list.length() > 0 ? "\t" : "") + entry;
+				}
+				System.out.println(list);
+				response.setContentType("text/html;charset=utf-8");
+				response.getWriter().print(list);
+				response.getWriter().flush();
+				response.getWriter().close();
+			}
+		}
+	}
+	
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html;charset=utf-8");
@@ -118,13 +139,15 @@ public class WebServer extends HttpServlet {
 				case "link":
 					doLink(request, response);
 					break;
+				case "entry":
+					doEntry(request, response);
 				default:
 			}
 	}
 
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		this.doGet(request, response);
+			doGet(request, response);
 	}
 
 	@Override
