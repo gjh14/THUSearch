@@ -29,8 +29,9 @@ public class Lighter {
 	
 	public Lighter(String queryString, Document doc, boolean flag){
 		entry = doc.get("entry");
-		Document con = FileIndex.getDocument(new File(doc.get("path")));
-		abst = con.get("body") != null ? con.get("body") : con.get("text");
+		abst = doc.get("body") != null ? doc.get("body") : doc.get("text");
+/*		Document con = FileIndex.getDocument(new File(doc.get("path")));
+		abst = con.get("body") != null ? con.get("body") : con.get("text");*/
 		analyzer = new IKAnalyzer(flag);
 		SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter("<em>", "</em>");
 		try {
