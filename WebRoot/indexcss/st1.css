@@ -96,7 +96,8 @@ input,textarea,button,select {
 }
 .querybox {
 	font-size:12px;
-	zoom:1
+	zoom:1;
+	position: relative;
 }
 
 .qborder {
@@ -122,20 +123,51 @@ input,textarea,button,select {
 	border-bottom-left-radius:2px
 }
 .query {
-    width: 511px;
-    _width: 508px;
-    font: 16px arial;
-    color: #333;
-    outline: 0;
-    padding: 4px 30px 4px 4px;
-    height: 30px;
-    line-height: 27px;
-    border: 1px solid #fff;
-    border-top-left-radius: 2px;
-    border-bottom-left-radius: 2px;
-    float: left;
-    background: #fff;
+	width:511px;
+	_width:508px;
+	font:16px arial;
+	color:#333;
+	outline:0;
+	padding:4px 30px 4px 4px;
+	height:20px;
+	padding:0 30px 0 4px\9;
+	height:29px\9;
+	line-height:29px\9;
+	_height:27px;
+	_line-height:27px;
+	border:1px solid #fff;
+	border-top-left-radius:2px;
+	border-bottom-left-radius:2px;
+	float:left;
+	background:#fff;
+	text-indent:10px;
 }
+
+.search_suggest {
+	position:absolute;
+	text-align: left;
+	float: left; 
+	width:548px;
+	z-index: 9999;
+	margin-top: 33px;
+	border: 1px solid #999999;
+	display: none;
+}
+.search_suggest li {
+	height: 30px;
+	overflow:hidden;
+	padding-left:3px;
+	padding-right:5px;
+	line-height:30px;
+	background:#FFFFFF;
+	cursor:default;
+	color:#666666;
+	font-size:18px;
+	text-indent:10px;
+}
+.search_suggest li.hover {
+	background:#EEEEEE;
+}    
 
 .blueQborder .query {
 	border:1px solid #fff
@@ -752,8 +784,12 @@ cite,cite a {
 	margin-right:0
 }
 .str_img img {
-	vertical-align:top;
-	position:relative
+	vertical-align:center;
+	position:relative;
+	min-height: 90px;
+	max-height: 120px;
+	min-width: 90px;
+	max-width: 180px;
 }
 .str_info_div {
 	padding-top:1px\9
@@ -3697,4 +3733,5 @@ a.vr_btn:hover span span span,a.vr_btn:focus span span span {
 .access_info a {
 	padding-left: 3px;
 	padding-right: 7px;
+	display: inline-block;
 }

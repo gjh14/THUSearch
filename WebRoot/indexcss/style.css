@@ -45,6 +45,32 @@ body { text-align:center; }
 	border-left:#ccc 1px solid;
 }
 
+.search .search_suggest {
+	text-align: left;
+	float: left; 
+	width: 90%;
+	z-index: 9999;
+	margin-top: 0px;
+	border: 1px solid #999999;
+	display: none;
+}
+.search .search_suggest li {
+	height: 30px;
+	overflow:hidden;
+	padding-left:3px;
+	padding-right:5px;
+	line-height:30px;
+	background:#FFFFFF;
+	cursor:default;
+	color:#666666;
+	font-size:20px;
+	text-indent:10px;
+}
+.search .search_suggest li.hover {
+	background:#EEEEEE;
+}    
+
+
 /* copyright */
 .copyright { position:absolute; left:43%; bottom:50px; }
 .copyright p { font-size:14px; line-height:30px; text-shadow:1px 1px #ccc; }
