@@ -20,7 +20,7 @@ public class DocxIndex {
 			XWPFWordExtractor extractor = new XWPFWordExtractor(docx);
 			String text = extractor.getText();
 			if(text != null){
-				String trans = new String(text.getBytes(), Detector.textCode(text)).replaceAll("\\?", "");
+				String trans = new String(text.getBytes(), Detector.textCode(text));
 				document.add(new TextField("text", trans, Field.Store.NO));
 			}
 			extractor.close();

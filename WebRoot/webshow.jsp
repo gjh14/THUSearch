@@ -49,6 +49,7 @@
 	String[] webEntrys = (String[]) request.getAttribute("webEntrys");
 	String[] webPaths = (String[]) request.getAttribute("webPaths");
 	String[] webAbsts = (String[]) request.getAttribute("webAbsts");
+	String[] webVis = (String[]) request.getAttribute("webVis"); 
 	String[] webImgs = (String[]) request.getAttribute("webImgs");
 	if(webEntrys != null && webEntrys.length > 0){
 		for(int i = 0; i < webEntrys.length; i++){
@@ -76,9 +77,16 @@
 								<p class="str_info">
 									<%= webAbsts[i] %>
 								</p>
+<%
+			if(webVis[i] != null){
+%>
+
 								<p class="access_info">
 									<a target="_blank" href="http://www.hehe.edu.cn/">垂直</a>
 								</p>
+<%
+			}
+%>
 								<div class="fb">
 									<cite> <%= webUrls[i] %> &nbsp;-&nbsp;</cite>
 									<a target="_blank" href="<%= webPaths[i]%>">网页快照</a>

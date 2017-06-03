@@ -19,9 +19,8 @@ public class PDFIndex{
 			String text = stripper.getText(pdf);
 			if(text != null){
 				String trans = new String(text.getBytes(), Detector.textCode(text));
-				String linked = trans.replaceAll("\\?", "")
-						.replaceAll("\n", "")
-						.replaceAll("\r", "");
+				String linked = trans.replaceAll("\r", "");
+				for(int pos; (pos = linked.indexOf('\n')))
 				document.add(new TextField("text", linked, Field.Store.NO));
 			}
 			pdf.close();

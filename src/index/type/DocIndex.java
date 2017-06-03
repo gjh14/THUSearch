@@ -18,7 +18,7 @@ public class DocIndex {
 			HWPFDocument doc = new HWPFDocument(in);
 			String text = doc.getDocumentText();
 			if(text != null){
-				String trans = new String(text.getBytes(), Detector.textCode(text)).replaceAll("\\?", "");
+				String trans = new String(text.getBytes(), Detector.textCode(text));
 				document.add(new TextField("text", trans, Field.Store.NO));
 			}
 			doc.close();
